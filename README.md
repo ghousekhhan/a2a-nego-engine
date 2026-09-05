@@ -344,7 +344,7 @@ npm install
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open https://a2a-nego-engine.vercel.app/ in your browser.
 Supported direct routes:
 - `/` — Homepage & Interactive Hero Demo
 - `/buyer` — Buyer Negotiation Workspace & Intent Composer
