@@ -57,6 +57,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
   const [expandedPayloadIds, setExpandedPayloadIds] = useState<Record<string, boolean>>({});
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number>(0);
   const [showOptionsList, setShowOptionsList] = useState<boolean>(false);
+  const [showEventRail, setShowEventRail] = useState<boolean>(true);
   const [showEvidence, setShowEvidence] = useState<boolean>(false);
   const [showCharts, setShowCharts] = useState<boolean>(false);
   const [isModifyOpen, setIsModifyOpen] = useState<boolean>(false);
@@ -805,6 +806,123 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
               <span className="font-semibold text-zinc-900 block">HUMAN</span>
               <span className="text-[10px] text-zinc-500 block">Reviews &amp; Authorizes</span>
             </div>
+          </div>
+
+          {/* Subtle A2A Message / Event Rail (Section 10) */}
+          <div className="border border-zinc-200 rounded-lg p-3 bg-zinc-50/50 space-y-2 font-mono text-[11px]">
+            <div className="flex items-center justify-between border-b border-zinc-200/60 pb-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></span>
+                <span>A2A Message Protocol Rail &middot; Turn Sequences</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEventRail(!showEventRail)}
+                className="text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
+              >
+                {showEventRail ? 'Hide Event Rail' : 'Show Event Rail (8 Events)'}
+              </button>
+            </div>
+
+            {showEventRail && (
+              <div className="space-y-1.5 divide-y divide-zinc-200/40 text-zinc-700">
+                <div className="pt-1 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:08</span>
+                    <span className="font-semibold text-zinc-900">BUYER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Request sent</span>
+                  </div>
+                  <span className="text-zinc-700 text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200">
+                    {formatNumber(baseQty)} units &middot; Pune
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:09</span>
+                    <span className="font-semibold text-zinc-900">SELLER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Inventory check verified</span>
+                  </div>
+                  <span className="text-emerald-700 text-[10px] bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    1,200 units in stock
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:10</span>
+                    <span className="font-semibold text-zinc-900">SELLER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Baseline quote</span>
+                  </div>
+                  <span className="text-zinc-900 font-semibold text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200">
+                    ₹405,000 &middot; Net 30
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:11</span>
+                    <span className="font-semibold text-zinc-900">BUYER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Evaluating offer</span>
+                  </div>
+                  <span className="text-zinc-600 text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200">
+                    Exceeds target budget
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:12</span>
+                    <span className="font-semibold text-zinc-900">BUYER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Counter trade-off</span>
+                  </div>
+                  <span className="text-blue-700 text-[10px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                    100% upfront settlement
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:13</span>
+                    <span className="font-semibold text-zinc-900">SELLER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Margin floor check</span>
+                  </div>
+                  <span className="text-emerald-700 text-[10px] bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    14.2% margin &ge; 10.0% floor
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:14</span>
+                    <span className="font-semibold text-zinc-900">SELLER AGENT</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Counter-offer</span>
+                  </div>
+                  <span className="text-zinc-900 font-bold text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200">
+                    ₹382,500 &middot; Upfront
+                  </span>
+                </div>
+
+                <div className="pt-1.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-400 text-[10px]">14:32:15</span>
+                    <span className="font-semibold text-emerald-800">DEALFLOW CHECK</span>
+                    <span className="text-zinc-400">&rarr;</span>
+                    <span className="text-zinc-600">Policy verified</span>
+                  </div>
+                  <span className="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    Budget PASS &middot; Margin PASS &middot; SLA PASS
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Two-Sided Commercial Conversation Stream */}
