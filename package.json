@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test tests/scenarios.test.ts tests/agents.test.ts tests/canonical_ui.test.ts"
+    "test": "node --experimental-strip-types --test tests/scenarios.test.ts tests/agents.test.ts tests/canonical_ui.test.ts tests/ai_and_search.test.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
