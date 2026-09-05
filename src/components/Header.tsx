@@ -58,17 +58,20 @@ export function Header({
         <div className="flex items-center gap-8">
           <button
             onClick={() => setRole('landing')}
-            className="flex items-center gap-2.5 text-left group focus:outline-none"
+            className="flex items-center gap-3 text-left group focus:outline-none"
           >
-            <div className="w-6 h-6 rounded-md bg-zinc-900 flex items-center justify-center text-white font-bold text-xs">
+            <div className="w-7 h-7 rounded-md bg-zinc-900 flex items-center justify-center text-white font-bold text-xs shadow-xs">
               <span className="leading-none">D</span>
             </div>
-            <span className="font-semibold text-zinc-900 text-sm tracking-tight group-hover:text-zinc-600 transition-colors">
-              DealFlow
-            </span>
+            <div>
+              <div className="font-semibold text-zinc-950 text-sm tracking-tight group-hover:text-zinc-600 transition-colors flex items-center gap-2">
+                <span>A2A DealFlow</span>
+                <span className="hidden md:inline text-[11px] font-normal text-zinc-400 font-sans">| AI agents negotiate. Businesses stay in control.</span>
+              </div>
+            </div>
           </button>
 
-          {/* Core Navigation: Negotiate · Deals · Activity */}
+          {/* Clean Core Navigation: Negotiate · Search · Deals · Activity · Admin */}
           <nav className="flex items-center gap-1 text-xs font-medium">
             <button
               onClick={() => {
@@ -76,12 +79,21 @@ export function Header({
                 setActiveTab('control_room');
               }}
               className={`px-3 py-1.5 rounded-md transition-colors ${
-                role === 'buyer'
+                role === 'buyer' && activeTab === 'control_room'
                   ? 'bg-zinc-100 text-zinc-900 font-semibold'
                   : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
               }`}
             >
               Negotiate
+            </button>
+            <button
+              onClick={() => {
+                setRole('buyer');
+                setActiveTab('control_room');
+              }}
+              className="px-3 py-1.5 rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+            >
+              Search
             </button>
             <button
               onClick={() => {
@@ -98,6 +110,19 @@ export function Header({
             </button>
             <button
               onClick={() => {
+                setRole('buyer');
+                setActiveTab('audit');
+              }}
+              className={`px-3 py-1.5 rounded-md transition-colors ${
+                role === 'buyer' && activeTab === 'audit'
+                  ? 'bg-zinc-100 text-zinc-900 font-semibold'
+                  : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+              }`}
+            >
+              Activity
+            </button>
+            <button
+              onClick={() => {
                 setRole('admin');
                 setActiveTab('control_room');
               }}
@@ -107,7 +132,7 @@ export function Header({
                   : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
               }`}
             >
-              Activity
+              Admin
             </button>
           </nav>
         </div>

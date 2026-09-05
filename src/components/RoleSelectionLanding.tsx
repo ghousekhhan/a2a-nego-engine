@@ -85,11 +85,11 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
     <div className="max-w-[960px] mx-auto py-12 px-4 space-y-28 text-zinc-900">
       
       {/* ================================================== */}
-      {/* 01 — WHAT IS IT? */}
+      {/* 01 — HERO */}
       {/* ================================================== */}
       <section className="space-y-6 pt-4 text-left max-w-2xl">
         <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-          DealFlow Commercial Protocol
+          A2A DealFlow
         </p>
 
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-zinc-950 leading-[1.12]">
@@ -98,34 +98,33 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
         </h1>
 
         <p className="text-base text-zinc-600 leading-relaxed font-normal">
-          DealFlow lets businesses negotiate commercial transactions through their own AI agents — across price, volume, delivery schedules, and payment terms. Private reservation economics stay confidential, deterministic rules protect your margins, and humans authorize the final agreement.
+          DealFlow lets businesses find suppliers, negotiate commercial terms through AI agents, and approve the final deal.
         </p>
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
           <button
             onClick={() => onSelectRole('buyer')}
-            className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs px-5 py-3 rounded-lg transition-all flex items-center gap-2"
+            className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm px-6 py-3 rounded-lg transition-all flex items-center gap-2 shadow-xs"
           >
-            Negotiate as Buyer <ArrowRight className="w-3.5 h-3.5" />
+            Start negotiating <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={() => onSelectRole('seller')}
-            className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-xs px-5 py-3 rounded-lg transition-all flex items-center gap-2"
+            className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-sm px-5 py-3 rounded-lg transition-all flex items-center gap-2"
           >
-            Negotiate as Seller <ArrowRight className="w-3.5 h-3.5" />
+            Negotiate as Seller
           </button>
         </div>
 
-        <div className="pt-2 text-xs text-zinc-400 flex items-center gap-4 font-mono">
-          <span>Price</span>
-          <span>&middot;</span>
-          <span>Quantity</span>
-          <span>&middot;</span>
-          <span>Delivery</span>
-          <span>&middot;</span>
-          <span>Payment</span>
-          <span>&middot;</span>
-          <span>Margin Protection</span>
+        {/* Search → Negotiate → Approve → Pay */}
+        <div className="pt-3 flex items-center gap-2.5 text-xs text-zinc-500 font-medium">
+          <span className="text-zinc-900 font-semibold">Search</span>
+          <span className="text-zinc-300">→</span>
+          <span className="text-zinc-900 font-semibold">Negotiate</span>
+          <span className="text-zinc-300">→</span>
+          <span className="text-zinc-900 font-semibold">Approve</span>
+          <span className="text-zinc-300">→</span>
+          <span className="text-zinc-900 font-semibold">Pay</span>
         </div>
       </section>
 
