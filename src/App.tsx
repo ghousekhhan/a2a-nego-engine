@@ -32,9 +32,9 @@ export function App() {
   } = state;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased selection:bg-blue-100">
+    <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 flex flex-col font-sans antialiased selection:bg-zinc-200">
       
-      {/* Light B2B SaaS Header Bar */}
+      {/* Editorial Navigation Header */}
       <Header
         role={role}
         setRole={setRole}
@@ -55,7 +55,7 @@ export function App() {
       />
 
       {/* Main App Container */}
-      <main className="flex-1 max-w-[1700px] w-full mx-auto p-4 md:p-6">
+      <main className="flex-1 max-w-[1280px] w-full mx-auto px-4 sm:px-6 py-6">
         
         {/* LANDING PAGE ROUTE */}
         {role === 'landing' && (

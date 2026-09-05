@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
   Check,
-  Zap,
+  Play,
+  Pause,
+  RotateCcw,
+  Lock,
+  CreditCard,
   Building2,
   Users,
-  BarChart3,
+  Activity,
+  ArrowUpRight,
 } from 'lucide-react';
 import type { UserRole } from '../store/canonicalState.ts';
 import { CANONICAL_SCENARIOS } from '../data/canonicalScenarios.ts';
@@ -19,222 +22,385 @@ interface RoleSelectionLandingProps {
 }
 
 export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSelectionLandingProps) {
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Auto-playing negotiation step state (0 to 5)
+  const [activeStep, setActiveStep] = useState<number>(5);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
-  const interactiveOptions = [
+  useEffect(() => {
+    if (!isPlaying) return;
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev >= 5 ? 0 : prev + 1));
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  const decisionOptions = [
     {
+      num: '01',
       title: 'BEST OVERALL',
-      badge: 'Recommended',
       price: 382500,
+      unitPrice: 765,
       qty: 500,
-      delivery: '5 days',
-      savings: '₹7,500 savings',
-      tradeoff: 'Optimal balance of price, delivery SLA & supplier reliability.',
+      delivery: '6 days',
+      terms: 'Upfront payment',
+      summary: 'Optimal balance of price, delivery SLA and supplier reliability.',
       scenarioId: 'scenario-01',
     },
     {
-      title: 'LOWEST PRICE',
-      badge: 'Lowest Cost',
+      num: '02',
+      title: 'LOWEST TOTAL OUTLAY',
       price: 360000,
+      unitPrice: 800,
       qty: 450,
-      delivery: '5 days',
-      savings: '₹30,000 savings',
-      tradeoff: 'Minimizes total cash outlay to target budget limit.',
+      delivery: '6 days',
+      terms: 'Net 30',
+      summary: 'Minimizes cash outlay to target budget at a slightly reduced volume.',
       scenarioId: 'scenario-02',
     },
     {
+      num: '03',
       title: 'FASTEST DELIVERY',
-      badge: 'Expedited SLA',
       price: 390000,
+      unitPrice: 780,
       qty: 500,
       delivery: '3 days',
-      savings: '3-day express',
-      tradeoff: 'Priority fulfillment for emergency sourcing requirements.',
+      terms: 'Net 30',
+      summary: 'Expedited express shipment for urgent production turnaround.',
       scenarioId: 'scenario-06',
     },
     {
+      num: '04',
       title: 'BEST UNIT ECONOMICS',
-      badge: 'Bulk Discount',
       price: 417270,
+      unitPrice: 695.45,
       qty: 600,
-      delivery: '5 days',
-      savings: '₹695.45 / unit',
-      tradeoff: 'Unlocks maximum volume discount tier per unit.',
+      delivery: '6 days',
+      terms: 'Upfront payment',
+      summary: 'Unlocks maximum tier volume discount at ₹695.45 per unit.',
       scenarioId: 'scenario-03',
     },
   ];
 
   return (
-    <div className="max-w-[1040px] mx-auto py-8 px-4 space-y-20 font-sans antialiased text-slate-900">
+    <div className="max-w-[960px] mx-auto py-12 px-4 space-y-28 text-zinc-900">
       
       {/* ================================================== */}
-      {/* 1. HERO SECTION */}
+      {/* 01 — WHAT IS IT? */}
       {/* ================================================== */}
-      <section className="text-center space-y-6 pt-4 max-w-3xl mx-auto">
-        <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block">
-          A2A DealFlow
-        </span>
-        
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
-          Let your AI negotiate the deal.
-        </h1>
-        
-        <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-2xl mx-auto">
-          Buyer and seller agents negotiate price, quantity, delivery and payment in real time. DealFlow evaluates every proposal against the commercial rules set by both sides and puts the final agreement in human hands.
+      <section className="space-y-6 pt-4 text-left max-w-2xl">
+        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          DealFlow Commercial Protocol
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-zinc-950 leading-[1.12]">
+          Your agent negotiates.<br />
+          <span className="text-zinc-500">Their agent responds.</span>
+        </h1>
+
+        <p className="text-base text-zinc-600 leading-relaxed font-normal">
+          DealFlow lets businesses negotiate commercial transactions through their own AI agents — across price, volume, delivery schedules, and payment terms. Private reservation economics stay confidential, deterministic rules protect your margins, and humans authorize the final agreement.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-4 pt-2">
           <button
-            onClick={() => {
-              onSelectRole('buyer');
-            }}
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-3 px-6 rounded-xl transition-all shadow-2xs"
+            onClick={() => onSelectRole('buyer')}
+            className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs px-5 py-3 rounded-lg transition-all flex items-center gap-2"
           >
-            TRY DEALFLOW
+            Negotiate as Buyer <ArrowRight className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => scrollToSection('how-it-works')}
-            className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-3 px-6 rounded-xl border border-slate-300 transition-all"
+            onClick={() => onSelectRole('seller')}
+            className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-xs px-5 py-3 rounded-lg transition-all flex items-center gap-2"
           >
-            HOW IT WORKS
+            Negotiate as Seller <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <p className="text-xs text-slate-500 font-semibold pt-2">
-          AI negotiates. Rules protect the economics. Humans approve.
-        </p>
+        <div className="pt-2 text-xs text-zinc-400 flex items-center gap-4 font-mono">
+          <span>Price</span>
+          <span>&middot;</span>
+          <span>Quantity</span>
+          <span>&middot;</span>
+          <span>Delivery</span>
+          <span>&middot;</span>
+          <span>Payment</span>
+          <span>&middot;</span>
+          <span>Margin Protection</span>
+        </div>
       </section>
 
       {/* ================================================== */}
-      {/* 2. INTERACTIVE PRODUCT PREVIEW */}
+      {/* 02 — SHOW IT: LIVE NEGOTIATION TIMELINE */}
       {/* ================================================== */}
-      {/* ================================================== */}
-      {/* 2. HERO PRODUCT DEMO — LIVE AGENT CONVERSATION */}
-      {/* ================================================== */}
-      <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs max-w-3xl mx-auto space-y-5 text-xs font-sans">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            Live Negotiation Preview
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> DEAL FOUND
-          </span>
+      <section className="space-y-6">
+        <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+          <div>
+            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              Live Commercial Exchange
+            </span>
+            <p className="text-xs text-zinc-600 mt-0.5">
+              Acme Manufacturing (Buyer) &times; Apex Industrial (Seller)
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span>{activeStep === 5 ? 'Agreement Reached' : `Turn ${Math.min(activeStep + 1, 4)} / 4`}</span>
+            </div>
+
+            <div className="flex items-center gap-1 pl-2 border-l border-zinc-200">
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="p-1.5 text-zinc-400 hover:text-zinc-800 transition-colors"
+                title={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              </button>
+              <button
+                onClick={() => setActiveStep(0)}
+                className="p-1.5 text-zinc-400 hover:text-zinc-800 transition-colors"
+                title="Replay"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* CONVERSATION FLOW */}
-        <div className="space-y-3">
-          {/* USER */}
-          <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-900 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-white border border-slate-200 rounded">
-                USER INTENT
-              </span>
+        {/* Commercial Conversation Flow (Buyer Left, Seller Right, DealFlow Center) */}
+        <div className="space-y-5 py-2">
+          
+          {/* INTENT: Buyer Human Request */}
+          <div className="max-w-lg">
+            <div className="text-[11px] font-mono text-zinc-400 mb-1">
+              HUMAN INTENT &middot; ACME MANUFACTURING
             </div>
-            <p className="font-mono text-slate-900 text-xs font-medium pt-0.5">
-              "I need 500 industrial bearings within 6 days under ₹390,000."
-            </p>
-          </div>
-
-          {/* DEALFLOW */}
-          <div className="bg-blue-50/60 border border-blue-200 p-3 rounded-xl space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-blue-800 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-white border border-blue-200 rounded">
-                DEALFLOW
-              </span>
-            </div>
-            <p className="text-slate-800 text-xs">
-              Got it. I'm checking available suppliers and coordinating autonomous negotiation between buyer and seller agents.
-            </p>
-          </div>
-
-          {/* BUYER AGENT */}
-          <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 p-3 rounded-xl space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">BUYER AGENT &bull; Representing buyer requirements</span>
-              <span className="text-[10px] text-slate-400">Step 1</span>
-            </div>
-            <p className="text-slate-800 text-xs">
-              "Searching for commercially feasible suppliers meeting &le; ₹390,000 budget and 6-day delivery requirement."
-            </p>
-          </div>
-
-          {/* SELLER AGENT */}
-          <div className="bg-slate-50 border-l-4 border-l-emerald-600 border border-slate-200 p-3 rounded-xl space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-emerald-700 text-[10px] uppercase">SELLER AGENT &bull; Representing seller economics</span>
-              <span className="text-[10px] text-slate-400">Step 2</span>
-            </div>
-            <p className="text-slate-800 text-xs">
-              "Supplier Apex can deliver 500 units in 5 days at ₹750/unit (₹375,000 total). Standard Net 30 terms."
-            </p>
-          </div>
-
-          {/* BUYER AGENT CONCESSION PROBE */}
-          <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 p-3 rounded-xl space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">BUYER AGENT &bull; Commercial concession</span>
-              <span className="text-[10px] text-slate-400">Step 3</span>
-            </div>
-            <p className="text-slate-800 text-xs">
-              "Can you improve unit pricing if the buyer commits to higher order volume?"
-            </p>
-          </div>
-
-          {/* SELLER AGENT COUNTER */}
-          <div className="bg-slate-50 border-l-4 border-l-emerald-600 border border-slate-200 p-3 rounded-xl space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-emerald-700 text-[10px] uppercase">SELLER AGENT &bull; Counter proposal</span>
-              <span className="text-[10px] text-slate-400">Step 4</span>
-            </div>
-            <p className="text-slate-800 text-xs">
-              "At 600 units, I can reduce unit price to ₹695.45/unit while maintaining my 10.0% minimum profit margin."
-            </p>
-          </div>
-
-          {/* DECISION ENGINE POLICY CHECK */}
-          <div className="bg-purple-50/80 border border-purple-200 p-3.5 rounded-xl space-y-1.5 text-[11px] text-purple-950">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-purple-800 uppercase tracking-wider text-[10px]">
-                DECISION ENGINE &bull; Commercial Policy Check
-              </span>
-              <span className="text-emerald-700 font-bold text-[10px]">✓ Commercially Feasible</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-purple-900 font-medium pt-0.5">
-              <span>✓ Budget &le; ₹390,000</span>
-              <span>✓ Seller Margin &ge; 10%</span>
-              <span>✓ Delivery &le; 6 Days</span>
-              <span>✓ Spend &le; Authority</span>
+            <div className="text-sm font-medium text-zinc-900 pl-3 border-l border-zinc-900 py-0.5">
+              "I need 500 industrial bearings delivered within 6 days. Authorized budget is ₹390,000."
             </div>
           </div>
 
-          {/* DEALFLOW SUMMARY */}
-          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl space-y-2 text-emerald-950">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-emerald-900 text-xs uppercase">DEALFLOW &bull; 4 VIABLE STRUCTURES FOUND</span>
-              <span className="text-emerald-800 text-xs font-semibold">Recommended Deal: ₹3,82,500</span>
+          {/* TURN 1: Buyer Agent Probes Baseline */}
+          {activeStep >= 1 && (
+            <div className="max-w-md">
+              <div className="text-[11px] font-mono text-zinc-500 mb-1">
+                BUYER AGENT &middot; Representing Acme Manufacturing
+              </div>
+              <div className="text-xs text-zinc-800 pl-3 border-l-2 border-zinc-400 py-1 bg-zinc-50/50">
+                "Requesting formal quote for 500 bearings. Requirements: delivery within 6 days, authorized spend under ₹390,000."
+              </div>
             </div>
-            <p className="text-slate-700 text-xs">
-              Autonomous negotiation concluded. Select an actionable deal structure below to review and approve:
-            </p>
+          )}
+
+          {/* TURN 2: Seller Agent Responds */}
+          {activeStep >= 2 && (
+            <div className="max-w-md ml-auto text-right">
+              <div className="text-[11px] font-mono text-zinc-500 mb-1">
+                SELLER AGENT &middot; Representing Apex Industrial
+              </div>
+              <div className="text-xs text-zinc-800 pr-3 border-r-2 border-zinc-900 py-1 bg-zinc-50/50 text-left">
+                "We can meet the 6-day timeline. Baseline price for 500 units is ₹405,000 (₹810/unit) on standard Net 30 payment terms."
+              </div>
+            </div>
+          )}
+
+          {/* TURN 3: Buyer Agent Concession Trade-off */}
+          {activeStep >= 3 && (
+            <div className="max-w-md">
+              <div className="text-[11px] font-mono text-zinc-500 mb-1">
+                BUYER AGENT &middot; Concession Proposal
+              </div>
+              <div className="text-xs text-zinc-800 pl-3 border-l-2 border-zinc-400 py-1 bg-zinc-50/50">
+                "That exceeds our authorized budget. If the buyer pays 100% upfront on order confirmation, can you reduce the total price?"
+              </div>
+            </div>
+          )}
+
+          {/* TURN 4: Seller Counter with Margin Protection */}
+          {activeStep >= 4 && (
+            <div className="max-w-md ml-auto text-right">
+              <div className="text-[11px] font-mono text-zinc-500 mb-1">
+                SELLER AGENT &middot; Economic Counter
+              </div>
+              <div className="text-xs text-zinc-800 pr-3 border-r-2 border-zinc-900 py-1 bg-zinc-50/50 text-left">
+                "With immediate upfront payment, I can reduce the total to ₹382,500 (₹765/unit). Our minimum profit margin floor remains protected."
+              </div>
+            </div>
+          )}
+
+          {/* DEALFLOW POLICY CHECK: Centered */}
+          {activeStep >= 5 && (
+            <div className="py-3 border-y border-zinc-200/80 my-4">
+              <div className="max-w-md mx-auto text-center space-y-1.5">
+                <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+                  DEALFLOW &middot; DETERMINISTIC POLICY VERIFICATION
+                </div>
+                <div className="text-xs text-zinc-900 font-medium">
+                  Policy check complete: Both sides are within commercial parameters.
+                </div>
+                <div className="flex items-center justify-center gap-4 text-[11px] text-zinc-600 font-mono">
+                  <span>✓ Budget (&le; ₹390k)</span>
+                  <span>✓ Margin (&ge; 10%)</span>
+                  <span>✓ Delivery (&le; 6d)</span>
+                  <span>✓ Authority (Level 1)</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* DEAL FOUND: Commercial Outcome */}
+          {activeStep >= 5 && (
+            <div className="pt-2 pl-3 border-l-2 border-emerald-600 space-y-2">
+              <div className="text-xs font-mono text-emerald-800 uppercase tracking-wider">
+                Deal Found &middot; Ready for Human Approval
+              </div>
+              <div className="flex flex-wrap items-baseline gap-4">
+                <span className="text-2xl font-bold text-zinc-950 font-mono">₹382,500</span>
+                <span className="text-xs text-zinc-600 font-mono">₹765 / unit &middot; 500 units &middot; 6 days delivery &middot; Upfront payment</span>
+              </div>
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    onSelectScenario('scenario-01');
+                    onSelectRole('buyer');
+                  }}
+                  className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  Review and Authorize <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </section>
+
+      {/* ================================================== */}
+      {/* 03 — WHY A2A? (CONTRAST & PRIVATE ECONOMICS) */}
+      {/* ================================================== */}
+      <section className="space-y-8 pt-6 border-t border-zinc-200">
+        <div className="max-w-xl space-y-2">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            Why Agent-to-Agent?
+          </span>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            Negotiation changes when both sides have an agent.
+          </h2>
+          <p className="text-xs text-zinc-600 leading-relaxed">
+            In traditional procurement, human buyers and sellers spend days exchanging emails, bluffing on margins, and guessing trade-offs. DealFlow computes optimal multi-variable agreements in seconds without either party exposing private reservation economics.
+          </p>
+        </div>
+
+        {/* Side-by-Side Comparison (No heavy containers) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-2 text-xs">
+          
+          {/* Today */}
+          <div className="space-y-3">
+            <div className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              Manual Negotiation Today
+            </div>
+            <div className="font-mono text-zinc-600 text-[11px] pb-2 border-b border-zinc-200">
+              Human &harr; Email &harr; Phone &harr; Spreadsheet &harr; Human
+            </div>
+            <ul className="space-y-2.5 text-zinc-600">
+              <li className="flex items-start gap-2">
+                <span className="text-zinc-400">&mdash;</span>
+                <span><strong>Days of latency:</strong> Simple adjustments in payment terms or delivery dates require multiple email loops.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-zinc-400">&mdash;</span>
+                <span><strong>Asymmetric bluffing:</strong> Parties hide true constraints, creating stale stalemates or leaving value on the table.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-zinc-400">&mdash;</span>
+                <span><strong>Uncalculated concessions:</strong> Trade-offs between payment terms and volume discounts are guessed intuitively.</span>
+              </li>
+            </ul>
           </div>
 
-          {/* 4 ACTIONABLE DEAL OPTIONS CARDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            {interactiveOptions.map((opt, idx) => (
-              <div key={idx} className="bg-white border border-slate-200 hover:border-blue-400 rounded-xl p-4 space-y-2 flex flex-col justify-between transition-all">
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-900 text-[11px]">{opt.title}</span>
-                    <span className="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded text-[10px]">{opt.badge}</span>
-                  </div>
-                  <div className="text-xl font-extrabold text-slate-900">{formatMoney(opt.price)}</div>
-                  <p className="text-[11px] text-slate-600">
-                    {formatNumber(opt.qty)} units &bull; {opt.delivery} &bull; <strong className="text-emerald-700">{opt.savings}</strong>
-                  </p>
-                  <p className="text-[10px] text-slate-500 pt-1">{opt.tradeoff}</p>
+          {/* DealFlow */}
+          <div className="space-y-3">
+            <div className="text-xs font-semibold text-zinc-900 uppercase tracking-wider">
+              With A2A DealFlow
+            </div>
+            <div className="font-mono text-zinc-900 text-[11px] pb-2 border-b border-zinc-900 font-medium">
+              Buyer Agent &harr; Decision Engine &harr; Seller Agent
+            </div>
+            <ul className="space-y-2.5 text-zinc-800">
+              <li className="flex items-start gap-2">
+                <Check className="w-3.5 h-3.5 text-zinc-900 shrink-0 mt-0.5" />
+                <span><strong>Multi-round exploration in seconds:</strong> Agents evaluate volume tiers, payment timing, and delivery SLAs instantly.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-3.5 h-3.5 text-zinc-900 shrink-0 mt-0.5" />
+                <span><strong>Strict private economics:</strong> Buyer budget ceilings and seller cost margins are never revealed to the other side.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-3.5 h-3.5 text-zinc-900 shrink-0 mt-0.5" />
+                <span><strong>Mathematical Pareto efficiency:</strong> DealFlow finds the overlapping zone of agreement that maximizes mutual utility.</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Private Economics Detail */}
+        <div className="pt-6 border-t border-zinc-100 grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+          <div>
+            <span className="font-mono text-zinc-400 text-[11px] block">01 &middot; BUYER ECONOMICS</span>
+            <p className="font-medium text-zinc-900 mt-1">Authorized budget & deadlines</p>
+            <p className="text-zinc-500 mt-0.5">Kept confidential. The seller only sees whether a proposal meets policy, never the buyer’s max ceiling.</p>
+          </div>
+          <div>
+            <span className="font-mono text-zinc-400 text-[11px] block">02 &middot; SELLER ECONOMICS</span>
+            <p className="font-medium text-zinc-900 mt-1">Unit costs & 10% margin floor</p>
+            <p className="text-zinc-500 mt-0.5">Kept confidential. The buyer only sees structured offers and counters, never the supplier’s true margin.</p>
+          </div>
+          <div>
+            <span className="font-mono text-zinc-400 text-[11px] block">03 &middot; OVERLAPPING ZOPA</span>
+            <p className="font-medium text-zinc-900 mt-1">Deterministic matching</p>
+            <p className="text-zinc-500 mt-0.5">DealFlow’s engine identifies mutually acceptable terms mathematically without leaking either party's reservation prices.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================== */}
+      {/* 04 — THE DECISION: COMPACT DECISION LIST */}
+      {/* ================================================== */}
+      <section className="space-y-6 pt-6 border-t border-zinc-200">
+        <div className="max-w-xl space-y-2">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            Decision Moment
+          </span>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            Clear, actionable deal choices.
+          </h2>
+          <p className="text-xs text-zinc-600 leading-relaxed">
+            Instead of exposing raw negotiation logs and utility charts, DealFlow surfaces a concise list of actionable commercial packages.
+          </p>
+        </div>
+
+        {/* Editorial Decision List (No big cards) */}
+        <div className="divide-y divide-zinc-200/80 border-y border-zinc-200/80 text-xs">
+          {decisionOptions.map((opt) => (
+            <div key={opt.num} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+              <div className="space-y-1 max-w-lg">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-zinc-400 text-[11px]">{opt.num}</span>
+                  <span className="font-semibold text-zinc-900 text-xs">{opt.title}</span>
+                  <span className="text-zinc-400">&middot;</span>
+                  <span className="text-zinc-500 font-mono">{opt.delivery}</span>
+                  <span className="text-zinc-400">&middot;</span>
+                  <span className="text-zinc-500 font-mono">{opt.terms}</span>
+                </div>
+                <p className="text-zinc-600 text-xs">{opt.summary}</p>
+              </div>
+
+              <div className="flex items-center justify-between sm:justify-end gap-6 shrink-0">
+                <div className="text-left sm:text-right font-mono">
+                  <div className="font-semibold text-zinc-900 text-sm">{formatMoney(opt.price)}</div>
+                  <div className="text-zinc-400 text-[11px]">{formatMoney(opt.unitPrice, true)}/unit &middot; {formatNumber(opt.qty)} units</div>
                 </div>
 
                 <button
@@ -242,239 +408,151 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
                     onSelectScenario(opt.scenarioId);
                     onSelectRole('buyer');
                   }}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] py-2 rounded-lg transition-all mt-2"
+                  className="bg-zinc-100 group-hover:bg-zinc-900 group-hover:text-white text-zinc-900 font-medium text-xs px-3.5 py-2 rounded-md transition-colors"
                 >
-                  Get this deal
+                  Select Deal
                 </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ================================================== */}
-      {/* 3. WHAT DEALFLOW DOES (NEGOTIATE, EVALUATE, APPROVE) */}
+      {/* 05 — TRUST: AI VS DECISION ENGINE */}
       {/* ================================================== */}
-      <section id="what-it-does" className="space-y-8 pt-6 border-t border-slate-200">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">WHAT DEALFLOW DOES</span>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Commercial negotiation built for speed & safety.
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-2">
-            <span className="text-xs font-mono font-bold text-blue-600">01 &bull; NEGOTIATE</span>
-            <h3 className="text-base font-bold text-slate-900">AI Agents Negotiate</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              AI buyer and seller agents exchange offers, volume discounts, and delivery SLA concessions in real time.
-            </p>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-2">
-            <span className="text-xs font-mono font-bold text-purple-600">02 &bull; EVALUATE</span>
-            <h3 className="text-base font-bold text-slate-900">Decision Engine Evaluates</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              The Decision Engine checks budget, minimum profit margin, delivery timeline, quantity, and authority limits.
-            </p>
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-2">
-            <span className="text-xs font-mono font-bold text-emerald-600">03 &bull; APPROVE</span>
-            <h3 className="text-base font-bold text-slate-900">Human Approves</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              A human reviews the agreement and evidence before execution via Razorpay sandbox payment.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-xs text-slate-800 font-bold text-center">
-          AI negotiates. Rules protect the economics. Humans approve.
-        </div>
-      </section>
-
-      {/* ================================================== */}
-      {/* 4. WHY THIS MATTERS */}
-      {/* ================================================== */}
-      <section className="space-y-6 pt-6 border-t border-slate-200">
-        <div className="max-w-2xl space-y-3">
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            B2B negotiation is slow and trade-offs are difficult.
-          </h2>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            A supplier offering the lowest unit price may have poor delivery SLA, insufficient reliability, unacceptable profit margins, or strict payment constraints. Buyers and sellers optimize fundamentally different commercial variables.
-          </p>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Traditional procurement forces humans to manually resolve these trade-offs through long phone calls and email chains. <strong>A2A DealFlow lets agents negotiate economic trade-offs directly while deterministic rules protect your business.</strong>
-          </p>
-        </div>
-      </section>
-
-      {/* ================================================== */}
-      {/* 5. AI VS DECISION ENGINE */}
-      {/* ================================================== */}
-      <section className="space-y-8 pt-6 border-t border-slate-200">
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+      <section className="space-y-8 pt-6 border-t border-zinc-200">
+        <div className="max-w-xl space-y-2">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            Control Architecture
+          </span>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
             AI can negotiate. It should not control the money.
           </h2>
+          <p className="text-xs text-zinc-600 leading-relaxed">
+            Language models are creative and fluid; commercial budgets and legal obligations are deterministic and binding. DealFlow cleanly separates negotiation conversation from commercial decision authority.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-3">
-            <span className="font-bold text-blue-600 uppercase tracking-wider">WHAT AI DOES</span>
-            <ul className="space-y-2 text-slate-700 font-medium">
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Understands natural language buyer requests</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Communicates structured offers to suppliers</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Negotiates volume & SLA concessions</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Explains commercial outcomes in plain language</li>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs">
+          <div className="space-y-2">
+            <span className="font-mono text-zinc-400 text-[11px] uppercase tracking-wider block">
+              WHAT AI HANDLES
+            </span>
+            <ul className="space-y-2 text-zinc-600 pl-4 border-l border-zinc-200">
+              <li>Natural language understanding of buyer requirements</li>
+              <li>Agent-to-agent proposal drafting and concession framing</li>
+              <li>Exploring volume tiers and delivery schedules</li>
+              <li>Translating technical outcomes into human-readable explanations</li>
             </ul>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-3">
-            <span className="font-bold text-purple-600 uppercase tracking-wider">WHAT THE DECISION ENGINE CONTROLS</span>
-            <ul className="space-y-2 text-slate-700 font-medium">
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Authorized Buyer Budget Limit</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Minimum Seller Profit Margin Floor</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Quantity Tiers & Stock Constraints</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Delivery SLA & Payment Terms</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Governance & Approval Gates</li>
+          <div className="space-y-2">
+            <span className="font-mono text-zinc-400 text-[11px] uppercase tracking-wider block">
+              WHAT THE DECISION ENGINE ENFORCES
+            </span>
+            <ul className="space-y-2 text-zinc-900 font-medium pl-4 border-l border-zinc-900">
+              <li>Hard buyer budget ceiling (never exceeded)</li>
+              <li>Seller profit margin floor (&ge; 10.0% protected)</li>
+              <li>Supplier delivery feasibility & inventory limits</li>
+              <li>Financial delegation of authority gates</li>
             </ul>
-          </div>
-        </div>
-
-        {/* SAFETY & CONTROL ARCHITECTURE FLOW */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 max-w-xl mx-auto space-y-3 text-center text-xs">
-          <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">THE SAFETY & CONTROL ARCHITECTURE</span>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 font-semibold text-slate-800">
-            <div className="bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-2xs">
-              <span className="text-blue-700 font-bold block text-[10px] uppercase">BUYER AGENT</span>
-              "Let's negotiate."
-            </div>
-            <span className="text-slate-400 font-bold">&rarr;</span>
-            <div className="bg-white border border-purple-200 px-3 py-2 rounded-lg shadow-2xs">
-              <span className="text-purple-700 font-bold block text-[10px] uppercase">DECISION ENGINE</span>
-              "Is this allowed?"
-            </div>
-            <span className="text-slate-400 font-bold">&rarr;</span>
-            <div className="bg-white border border-emerald-200 px-3 py-2 rounded-lg shadow-2xs">
-              <span className="text-emerald-700 font-bold block text-[10px] uppercase">HUMAN</span>
-              "Approve / Modify / Reject"
-            </div>
           </div>
         </div>
       </section>
 
       {/* ================================================== */}
-      {/* 6. HOW IT WORKS (FOUR STEPS) */}
+      {/* 06 — EXECUTION: CONTRACT TO RAZORPAY */}
       {/* ================================================== */}
-      <section id="how-it-works" className="space-y-8 pt-6 border-t border-slate-200">
+      <section className="space-y-6 pt-6 border-t border-zinc-200">
+        <div className="max-w-xl space-y-2">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            Commercial Settlement
+          </span>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            From negotiated agreement to digital payment.
+          </h2>
+          <p className="text-xs text-zinc-600 leading-relaxed">
+            Negotiation is completed when money moves. Once the human user approves the recommended deal, DealFlow binds the terms into a structured digital contract and initiates checkout via Razorpay sandbox.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 font-mono text-xs text-zinc-600 py-3 border-y border-zinc-200/80">
+          <span>Intent</span>
+          <span className="text-zinc-300">&rarr;</span>
+          <span>Conversation</span>
+          <span className="text-zinc-300">&rarr;</span>
+          <span>Negotiation</span>
+          <span className="text-zinc-300">&rarr;</span>
+          <span>Decision</span>
+          <span className="text-zinc-300">&rarr;</span>
+          <span>Human Approval</span>
+          <span className="text-zinc-300">&rarr;</span>
+          <span className="font-semibold text-zinc-900">Razorpay Payment</span>
+        </div>
+      </section>
+
+      {/* ================================================== */}
+      {/* 07 — GET STARTED / ROLE ENTRY POINTS */}
+      {/* ================================================== */}
+      <section className="space-y-8 pt-6 border-t border-zinc-200">
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            How it works.
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            Explore DealFlow
+          </span>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
+            Select your perspective.
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-          <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-2">
-            <span className="text-xs font-mono font-bold text-slate-400">01</span>
-            <h3 className="font-bold text-slate-900">REQUEST</h3>
-            <p className="text-slate-600 leading-relaxed">A buyer describes what they need in natural language.</p>
-          </div>
-
-          <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-2">
-            <span className="text-xs font-mono font-bold text-blue-600">02</span>
-            <h3 className="font-bold text-slate-900">NEGOTIATE</h3>
-            <p className="text-slate-600 leading-relaxed">Buyer and seller agents exchange commercially meaningful offers.</p>
-          </div>
-
-          <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-2">
-            <span className="text-xs font-mono font-bold text-purple-600">03</span>
-            <h3 className="font-bold text-slate-900">DECIDE</h3>
-            <p className="text-slate-600 leading-relaxed">The Decision Engine evaluates constraints and trade-offs.</p>
-          </div>
-
-          <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-2">
-            <span className="text-xs font-mono font-bold text-emerald-600">04</span>
-            <h3 className="font-bold text-slate-900">AUTHORIZE</h3>
-            <p className="text-slate-600 leading-relaxed">A human approves the agreement before execution.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================== */}
-      {/* 7. TRY DEALFLOW (THREE ROLE ENTRY POINTS) */}
-      {/* ================================================== */}
-      <section id="try-section" className="space-y-8 pt-6 border-t border-slate-200">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-            Try DealFlow
-          </h2>
-          <p className="text-xs text-slate-600">Select your perspective to see the negotiation in action.</p>
-        </div>
-
-        {/* THREE CHOICES ONLY */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
           
-          {/* BUYER */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">BUYER</span>
-              <h3 className="text-base font-bold text-slate-900">Find the best deal.</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Submit a sourcing request and select from Pareto candidate offers.
-              </p>
-            </div>
+          <div className="space-y-3 p-4 border border-zinc-200 rounded-lg hover:border-zinc-400 transition-colors">
+            <div className="font-semibold text-zinc-900 text-sm">Buyer Workspace</div>
+            <p className="text-zinc-600 leading-relaxed">
+              Describe your procurement need in natural language. Watch your agent negotiate and select from Pareto deal options.
+            </p>
             <button
               onClick={() => onSelectRole('buyer')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 rounded-lg transition-all"
+              className="text-xs font-medium text-zinc-900 hover:text-zinc-600 flex items-center gap-1 pt-1"
             >
-              TRY AS BUYER
+              Open Buyer View <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* SELLER */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">SELLER</span>
-              <h3 className="text-base font-bold text-slate-900">Protect your margin.</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Review incoming buyer requests and send automated or custom counters.
-              </p>
-            </div>
+          <div className="space-y-3 p-4 border border-zinc-200 rounded-lg hover:border-zinc-400 transition-colors">
+            <div className="font-semibold text-zinc-900 text-sm">Seller Desk</div>
+            <p className="text-zinc-600 leading-relaxed">
+              Review incoming buyer requests. Your agent protects your minimum 10% margin floor and proposes automated counters.
+            </p>
             <button
               onClick={() => onSelectRole('seller')}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-lg transition-all"
+              className="text-xs font-medium text-zinc-900 hover:text-zinc-600 flex items-center gap-1 pt-1"
             >
-              TRY AS SELLER
+              Open Seller View <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* ADMIN */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">ADMIN</span>
-              <h3 className="text-base font-bold text-slate-900">Understand marketplace performance.</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                View network GMV, buyer savings, agreement rates, and decision audit logs.
-              </p>
-            </div>
+          <div className="space-y-3 p-4 border border-zinc-200 rounded-lg hover:border-zinc-400 transition-colors">
+            <div className="font-semibold text-zinc-900 text-sm">Network Activity</div>
+            <p className="text-zinc-600 leading-relaxed">
+              Inspect operational activity, real-time negotiation velocity, agreement rates, and immutable policy audit logs.
+            </p>
             <button
               onClick={() => onSelectRole('admin')}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs py-2.5 rounded-lg transition-all"
+              className="text-xs font-medium text-zinc-900 hover:text-zinc-600 flex items-center gap-1 pt-1"
             >
-              VIEW MARKETPLACE
+              Open Activity View <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
         </div>
 
-        {/* DEMO SCENARIO SELECTOR */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        {/* Demo Benchmark Selector */}
+        <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs border-t border-zinc-100">
           <div>
-            <span className="font-bold text-slate-900">Demo Scenario Gallery</span>
-            <p className="text-slate-500 text-[11px]">Select any of the 10 canonical scenarios to evaluate specific engine rules.</p>
+            <span className="font-medium text-zinc-900">Canonical Scenario Gallery</span>
+            <span className="text-zinc-500 ml-2">10 deterministic test cases covering volume, margin defense, and SLAs.</span>
           </div>
 
           <select
@@ -484,9 +562,9 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
                 onSelectRole('buyer');
               }
             }}
-            className="bg-white border border-slate-300 text-slate-900 text-xs font-semibold rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="bg-white border border-zinc-200 text-zinc-800 text-xs font-medium rounded-md px-3 py-1.5 focus:outline-none cursor-pointer"
           >
-            <option value="">-- Select Demo Scenario --</option>
+            <option value="">-- Run Scenario Benchmark --</option>
             {CANONICAL_SCENARIOS.map((sc) => (
               <option key={sc.id} value={sc.id}>
                 Scenario {sc.scenarioNumber}: {sc.name}
@@ -494,24 +572,14 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             ))}
           </select>
         </div>
-
       </section>
 
       {/* ================================================== */}
-      {/* 8. RAZORPAY EXECUTION */}
+      {/* FOOTER */}
       {/* ================================================== */}
-      <section className="bg-slate-900 text-slate-100 rounded-2xl p-6 text-center space-y-2">
-        <h3 className="text-base font-bold">Razorpay Execution Integration</h3>
-        <p className="text-xs text-slate-400 max-w-xl mx-auto">
-          Once a human approves the final negotiated agreement, DealFlow creates a Razorpay payment order for instant digital contract settlement.
-        </p>
-      </section>
-
-      {/* ================================================== */}
-      {/* 9. FOOTER */}
-      {/* ================================================== */}
-      <footer className="text-center text-xs text-slate-400 pt-4 border-t border-slate-200">
-        A2A DealFlow &bull; AI Agents Negotiate. Businesses Stay in Control.
+      <footer className="pt-8 border-t border-zinc-200 text-xs text-zinc-400 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>DealFlow &middot; Autonomous Commercial Negotiation</div>
+        <div className="font-mono text-[11px]">Built for the Razorpay AI Buildathon</div>
       </footer>
 
     </div>

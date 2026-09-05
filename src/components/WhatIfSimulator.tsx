@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sliders, Sparkles, ArrowRight, CheckCircle2, TrendingUp, AlertCircle } from 'lucide-react';
+import { Sliders, ArrowRight } from 'lucide-react';
 import type { BuyerPolicy, SellerPolicy, SupplierFacts, CanonicalDeal } from '../types/index.ts';
 import { runWhatIfAnalysis } from '../engine/whatIf.ts';
 import { formatMoney, formatNumber, formatPercent } from '../utils/formatters.ts';
@@ -20,10 +20,10 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   const [activeQueryIndex, setActiveQueryIndex] = useState<number>(0);
 
   const presetQueries = [
-    { label: 'What if I increase quantity to 600 units?', query: { quantity: 600 } },
-    { label: 'What if I offer upfront payment?', query: { paymentTerms: 'upfront' } },
-    { label: 'What if delivery SLA can be 7 days?', query: { deliveryDays: 7 } },
-    { label: 'What if I increase budget by ₹20,000?', query: { maxTotalBudget: buyerPolicy.maxTotalBudget + 20000 } },
+    { label: 'Increase volume to 600 units', query: { quantity: 600 } },
+    { label: 'Offer upfront payment discount', query: { paymentTerms: 'upfront' } },
+    { label: 'Extend delivery SLA to 7 days', query: { deliveryDays: 7 } },
+    { label: 'Expand budget ceiling by ₹20,000', query: { maxTotalBudget: buyerPolicy.maxTotalBudget + 20000 } },
   ];
 
   const currentQuery = presetQueries[activeQueryIndex]?.query ?? { quantity: 600 };
@@ -38,123 +38,116 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   const newDeal = whatIfResult.newBestDeal?.deal;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 font-sans antialiased">
+    <div className="max-w-[860px] mx-auto space-y-8 text-zinc-900 font-sans antialiased py-2">
       
       {/* Title & Description */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
-        <div>
-          <div className="flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-blue-600" />
-            <h3 className="font-bold text-base text-slate-900">What-If Commercial Trade-off Simulator</h3>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Test policy parameter changes without restarting or altering the live negotiation. Every scenario is recalculated live by the Decision Engine.
-          </p>
-        </div>
-        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
-          Decision Engine What-If Core
-        </span>
+      <div className="space-y-1">
+        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          Decision Engine Simulator
+        </p>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-950">
+          Commercial Trade-off Simulator
+        </h1>
+        <p className="text-xs text-zinc-500 leading-relaxed max-w-xl">
+          Evaluate hypothetical commercial adjustments without altering active contract state. All calculations are executed deterministically against supplier economics.
+        </p>
       </div>
 
-      {/* Preset Query Selector Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+      {/* Preset Query Tabs (Minimal, text-first) */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 pb-3 text-xs font-medium">
         {presetQueries.map((item, idx) => (
           <button
             key={idx}
             onClick={() => setActiveQueryIndex(idx)}
-            className={`p-3.5 rounded-xl text-xs text-left transition-all border ${
+            className={`px-3 py-1.5 rounded-md transition-colors ${
               activeQueryIndex === idx
-                ? 'bg-blue-50 border-blue-500 text-blue-900 font-bold shadow-2xs'
-                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                ? 'bg-zinc-900 text-white'
+                : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
             }`}
           >
-            <div className="text-[10px] text-slate-500 font-semibold mb-1 uppercase tracking-wider">Preset {idx + 1}</div>
             {item.label}
           </button>
         ))}
       </div>
 
-      {/* Side-by-Side Comparison Table */}
-      <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-        <table className="w-full text-xs text-left border-collapse">
+      {/* Comparison Table */}
+      <div className="space-y-3">
+        <table className="w-full text-left font-mono text-xs">
           <thead>
-            <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-600 uppercase text-[10px] font-bold">
-              <th className="p-3.5">Commercial Dimension</th>
-              <th className="p-3.5">Current Approved Deal</th>
-              <th className="p-3.5 text-blue-700">What-If Scenario Result</th>
-              <th className="p-3.5 text-emerald-700">Impact / Delta</th>
+            <tr className="border-b border-zinc-200 text-zinc-400 text-[11px]">
+              <th className="pb-2 font-medium">DIMENSION</th>
+              <th className="pb-2 font-medium">CURRENT AGREEMENT</th>
+              <th className="pb-2 font-medium text-zinc-900">SIMULATED OUTCOME</th>
+              <th className="pb-2 font-medium text-right">NET DELTA</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 text-slate-800">
+          <tbody className="divide-y divide-zinc-100 text-zinc-900">
             <tr>
-              <td className="p-3.5 font-semibold text-slate-600">Total Price</td>
-              <td className="p-3.5 font-bold">{formatMoney(whatIfResult.baselineDeal?.totalBuyerCost ?? 382500)}</td>
-              <td className="p-3.5 font-bold text-blue-700">
-                {formatMoney(whatIfResult.newBestDeal?.totalBuyerCost ?? 382500)}
-              </td>
-              <td className="p-3.5 font-bold text-emerald-600">
+              <td className="py-2.5 font-sans text-zinc-600">Total Spend</td>
+              <td className="py-2.5">{formatMoney(whatIfResult.baselineDeal?.totalBuyerCost ?? 382500)}</td>
+              <td className="py-2.5 font-semibold text-zinc-950">{formatMoney(whatIfResult.newBestDeal?.totalBuyerCost ?? 382500)}</td>
+              <td className="py-2.5 text-right text-emerald-700 font-semibold">
                 {whatIfResult.priceDelta >= 0 ? `+${formatMoney(whatIfResult.priceDelta)}` : `-${formatMoney(Math.abs(whatIfResult.priceDelta))}`}
               </td>
             </tr>
 
             <tr>
-              <td className="p-3.5 font-semibold text-slate-600">Unit Price</td>
-              <td className="p-3.5">{formatMoney(baselineDeal.items[0]?.unitPrice ?? 800, true)} / unit</td>
-              <td className="p-3.5 text-blue-700">{formatMoney(newDeal?.items[0]?.unitPrice ?? 800, true)} / unit</td>
-              <td className="p-3.5 text-emerald-600 font-semibold">
-                {whatIfResult.unitPriceSaving > 0 ? `${formatMoney(whatIfResult.unitPriceSaving, true)}/unit saving` : 'No unit saving'}
+              <td className="py-2.5 font-sans text-zinc-600">Unit Rate</td>
+              <td className="py-2.5">{formatMoney(baselineDeal.items[0]?.unitPrice ?? 800, true)}</td>
+              <td className="py-2.5 font-semibold text-zinc-950">{formatMoney(newDeal?.items[0]?.unitPrice ?? 800, true)}</td>
+              <td className="py-2.5 text-right text-emerald-700">
+                {whatIfResult.unitPriceSaving > 0 ? `${formatMoney(whatIfResult.unitPriceSaving, true)} savings` : '0'}
               </td>
             </tr>
 
             <tr>
-              <td className="p-3.5 font-semibold text-slate-600">Order Quantity</td>
-              <td className="p-3.5">{formatNumber(baselineDeal.items[0]?.quantity ?? 500)} units</td>
-              <td className="p-3.5 text-blue-700 font-bold">{formatNumber(newDeal?.items[0]?.quantity ?? 500)} units</td>
-              <td className="p-3.5 text-slate-600 font-semibold">
-                +{(newDeal?.items[0]?.quantity ?? 500) - (baselineDeal.items[0]?.quantity ?? 500)} units
+              <td className="py-2.5 font-sans text-zinc-600">Order Quantity</td>
+              <td className="py-2.5">{formatNumber(baselineDeal.items[0]?.quantity ?? 500)} units</td>
+              <td className="py-2.5 font-semibold text-zinc-950">{formatNumber(newDeal?.items[0]?.quantity ?? 500)} units</td>
+              <td className="py-2.5 text-right text-zinc-600">
+                +{(newDeal?.items[0]?.quantity ?? 500) - (baselineDeal.items[0]?.quantity ?? 500)}
               </td>
             </tr>
 
             <tr>
-              <td className="p-3.5 font-semibold text-slate-600">Delivery SLA</td>
-              <td className="p-3.5">{baselineDeal.deliveryDays} Days</td>
-              <td className="p-3.5 text-blue-700">{newDeal?.deliveryDays ?? 0} Days</td>
-              <td className="p-3.5 text-amber-700">
+              <td className="py-2.5 font-sans text-zinc-600">Delivery SLA</td>
+              <td className="py-2.5">{baselineDeal.deliveryDays} Days</td>
+              <td className="py-2.5 font-semibold text-zinc-950">{newDeal?.deliveryDays ?? 0} Days</td>
+              <td className="py-2.5 text-right text-zinc-600">
                 {(newDeal?.deliveryDays ?? 0) - baselineDeal.deliveryDays >= 0 ? `+${(newDeal?.deliveryDays ?? 0) - baselineDeal.deliveryDays}d` : `${(newDeal?.deliveryDays ?? 0) - baselineDeal.deliveryDays}d`}
               </td>
             </tr>
 
             <tr>
-              <td className="p-3.5 font-semibold text-slate-600">Payment Terms</td>
-              <td className="p-3.5">{baselineDeal.paymentTerms.toUpperCase()}</td>
-              <td className="p-3.5 text-blue-700">{newDeal?.paymentTerms.toUpperCase() ?? '-'}</td>
-              <td className="p-3.5 text-slate-600">Terms adjusted</td>
+              <td className="py-2.5 font-sans text-zinc-600">Payment Terms</td>
+              <td className="py-2.5">{baselineDeal.paymentTerms.toUpperCase()}</td>
+              <td className="py-2.5 font-semibold text-zinc-950">{newDeal?.paymentTerms.toUpperCase() ?? '-'}</td>
+              <td className="py-2.5 text-right text-zinc-600">&mdash;</td>
             </tr>
 
             <tr>
-              <td className="p-3.5 font-semibold text-slate-600">Buyer Utility</td>
-              <td className="p-3.5">{formatPercent(whatIfResult.baselineDeal?.buyerUtility ?? 0.85)}</td>
-              <td className="p-3.5 text-blue-700">{formatPercent(whatIfResult.newBestDeal?.buyerUtility ?? 0.85)}</td>
-              <td className="p-3.5 font-bold text-emerald-600">
-                {whatIfResult.buyerUtilityDelta >= 0 ? `+${formatPercent(whatIfResult.buyerUtilityDelta)}` : formatPercent(whatIfResult.buyerUtilityDelta)} utility
+              <td className="py-2.5 font-sans text-zinc-600">Mathematical Utility</td>
+              <td className="py-2.5">{formatPercent(whatIfResult.baselineDeal?.buyerUtility ?? 0.85)}</td>
+              <td className="py-2.5 font-semibold text-zinc-950">{formatPercent(whatIfResult.newBestDeal?.buyerUtility ?? 0.85)}</td>
+              <td className="py-2.5 text-right text-emerald-700 font-semibold">
+                {whatIfResult.buyerUtilityDelta >= 0 ? `+${formatPercent(whatIfResult.buyerUtilityDelta)}` : formatPercent(whatIfResult.buyerUtilityDelta)}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      {/* Rationale & Recommendation Box */}
-      <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex items-start gap-3">
-        <Sparkles className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <div className="space-y-1 text-xs">
-          <div className="font-bold text-blue-900 uppercase tracking-wider">
-            Decision Engine Trade-off Rationale
-          </div>
-          <p className="text-slate-700 leading-relaxed font-sans">{whatIfResult.tradeoffExplanation}</p>
-          <div className="pt-2 text-emerald-700 font-bold">
-            {whatIfResult.recommendation}
-          </div>
-        </div>
+      {/* Rationale & Recommendation */}
+      <div className="pt-4 border-t border-zinc-200 text-xs space-y-1.5">
+        <span className="font-mono text-zinc-400 text-[11px] uppercase tracking-wider block">
+          ENGINE EVALUATION RATIONALE
+        </span>
+        <p className="text-zinc-700 leading-relaxed">
+          {whatIfResult.tradeoffExplanation}
+        </p>
+        <p className="text-emerald-800 font-medium pt-1">
+          {whatIfResult.recommendation}
+        </p>
       </div>
 
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { FileText, ShieldCheck, CheckCircle2, ArrowRight, Building2, Calendar, CreditCard, Lock } from 'lucide-react';
-import type { CanonicalDeal, ScoredDeal } from '../types/index.ts';
+import { FileText, ArrowRight, ArrowLeft, Lock } from 'lucide-react';
+import type { ScoredDeal } from '../types/index.ts';
 import { SEEDED_PRODUCT } from '../demoData.ts';
 import { formatMoney, formatNumber } from '../utils/formatters.ts';
 
@@ -17,137 +17,133 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 }) => {
   const deal = scoredDeal.deal;
   const contractId = `CTR-2026-8829`;
-  const dealId = deal.id ?? 'DEAL-8829-MRO';
+  const dealId = deal.id ?? 'DF-1048';
   const timestamp = new Date().toISOString();
 
   const qty = deal.items[0]?.quantity ?? 500;
-  const unitPrice = deal.items[0]?.unitPrice ?? 695.45;
+  const unitPrice = deal.items[0]?.unitPrice ?? 765;
   const lineTotal = Math.round(qty * unitPrice);
 
   return (
-    <div className="max-w-[1000px] mx-auto p-4 space-y-6 font-sans antialiased">
+    <div className="max-w-[760px] mx-auto space-y-8 text-zinc-900 font-sans antialiased py-2">
       
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-600" />
-          <div>
-            <h2 className="font-bold text-lg text-slate-900">
-              Commercial Purchase Agreement
-            </h2>
-            <p className="text-xs text-slate-500">
-              Generated automatically from Decision Engine validated commercial terms.
-            </p>
-          </div>
-        </div>
-        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
-          TERMS FROZEN & VALIDATED
+      {/* Top Breadcrumb & Controls */}
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 text-xs">
+        <button
+          onClick={onBack}
+          className="text-zinc-500 hover:text-zinc-900 flex items-center gap-1 font-medium transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to Negotiation
+        </button>
+
+        <span className="font-mono text-zinc-400 text-[11px]">
+          Contract #{contractId} &middot; Validated
         </span>
       </div>
 
-      {/* Contract Document Card */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+      {/* Contract Document (Document Typography) */}
+      <div className="bg-white p-8 sm:p-12 border border-zinc-200/80 rounded-lg shadow-2xs space-y-8 text-xs leading-relaxed">
         
         {/* Document Header */}
-        <div className="flex justify-between items-start border-b border-slate-200 pb-4">
+        <div className="space-y-2 border-b border-zinc-200 pb-6">
+          <div className="flex justify-between items-baseline font-mono text-[11px] text-zinc-400">
+            <span>BINDING COMMERCIAL PURCHASE AGREEMENT</span>
+            <span>Ref: {dealId}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950">
+            Commercial Supply & Purchase Contract
+          </h1>
+          <p className="text-zinc-500 text-xs">
+            Executed on {new Date(timestamp).toLocaleDateString()} through the DealFlow Autonomous Commercial Protocol.
+          </p>
+        </div>
+
+        {/* Contract Parties */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-2 text-xs">
+          <div className="space-y-1">
+            <span className="font-mono text-zinc-400 text-[11px] uppercase tracking-wider block">BUYER (ACCREDITED)</span>
+            <div className="font-semibold text-zinc-900 text-sm">Industrial Procurement Corp Ltd</div>
+            <div className="text-zinc-500">GSTIN: 27AAAAA0000A1Z5</div>
+            <div className="text-zinc-500 font-mono text-[11px]">Agent: Acme Buyer Agent v1.0</div>
+          </div>
+
+          <div className="space-y-1">
+            <span className="font-mono text-zinc-400 text-[11px] uppercase tracking-wider block">SUPPLIER (VERIFIED)</span>
+            <div className="font-semibold text-zinc-900 text-sm">Apex Industrial Components Ltd</div>
+            <div className="text-zinc-500">GSTIN: 07BBBBB1111B1Z2</div>
+            <div className="text-zinc-500 font-mono text-[11px]">Agent: Apex Seller Agent v1.0</div>
+          </div>
+        </div>
+
+        {/* Itemized Specification Schedule */}
+        <div className="space-y-3 pt-4 border-t border-zinc-100">
+          <span className="font-mono text-zinc-400 text-[11px] uppercase tracking-wider block">
+            SCHEDULE A &middot; DELIVERABLES & PRICING
+          </span>
+
+          <table className="w-full text-left font-mono text-xs">
+            <thead>
+              <tr className="border-b border-zinc-200 text-zinc-400 text-[11px]">
+                <th className="pb-2 font-medium">ITEM SPECIFICATION</th>
+                <th className="pb-2 font-medium">QTY</th>
+                <th className="pb-2 font-medium">UNIT PRICE</th>
+                <th className="pb-2 font-medium text-right">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 text-zinc-900">
+              <tr>
+                <td className="py-3 font-sans font-medium">{SEEDED_PRODUCT.name}</td>
+                <td className="py-3">{formatNumber(qty)} units</td>
+                <td className="py-3">{formatMoney(unitPrice, true)}</td>
+                <td className="py-3 text-right font-semibold">{formatMoney(lineTotal)}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr className="border-t border-zinc-200 font-semibold text-sm">
+                <td colSpan={3} className="pt-3 font-sans">Agreed Commercial Settlement</td>
+                <td className="pt-3 text-right font-bold text-zinc-950">{formatMoney(lineTotal)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {/* Commercial Covenants */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-zinc-100 text-xs">
           <div>
-            <h1 className="font-bold text-xl text-slate-900 tracking-tight">
-              BINDING COMMERCIAL PURCHASE CONTRACT
-            </h1>
-            <div className="text-xs text-slate-500 mt-1 space-x-4">
-              <span>Contract ID: <strong className="text-blue-700 font-mono">{contractId}</strong></span>
-              <span>Deal Ref: <strong className="text-slate-800 font-mono">{dealId}</strong></span>
-            </div>
+            <span className="font-mono text-zinc-400 text-[11px] block">DELIVERY COVENANT</span>
+            <p className="font-medium text-zinc-900 mt-1">{deal.deliveryDays} Business Days</p>
+            <p className="text-zinc-500 text-[11px] mt-0.5">Expedited fulfillment from central warehouse.</p>
           </div>
-          <div className="text-right text-xs text-slate-500">
-            <div>Executed: {new Date(timestamp).toLocaleDateString()}</div>
-            <div className="text-emerald-600 font-semibold mt-0.5">Status: READY FOR SETTLEMENT</div>
+          <div>
+            <span className="font-mono text-zinc-400 text-[11px] block">PAYMENT TERMS</span>
+            <p className="font-medium text-zinc-900 mt-1">{deal.paymentTerms.toUpperCase()}</p>
+            <p className="text-zinc-500 text-[11px] mt-0.5">Digital escrow release via Razorpay.</p>
           </div>
-        </div>
-
-        {/* Parties Grid */}
-        <div className="grid grid-cols-2 gap-4 text-xs">
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
-            <span className="text-[10px] text-slate-500 uppercase font-semibold">BUYING ENTITY</span>
-            <div className="font-bold text-slate-900 text-sm">Industrial Procurement Corp Ltd</div>
-            <div className="text-slate-500">GSTIN: 27AAAAA0000A1Z5</div>
-            <div className="text-slate-500">Authorized Agent: Buyer AI Agent v1.0</div>
-          </div>
-
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
-            <span className="text-[10px] text-slate-500 uppercase font-semibold">SELLING ENTITY</span>
-            <div className="font-bold text-slate-900 text-sm">Apex Industrial Components Ltd</div>
-            <div className="text-slate-500">GSTIN: 07BBBBB1111B1Z2</div>
-            <div className="text-slate-500">Authorized Agent: Seller AI Agent v1.0</div>
+          <div>
+            <span className="font-mono text-zinc-400 text-[11px] block">WARRANTY & SLA</span>
+            <p className="font-medium text-zinc-900 mt-1">12 Months Direct</p>
+            <p className="text-zinc-500 text-[11px] mt-0.5">96.0% historical delivery SLA guarantee.</p>
           </div>
         </div>
 
-        {/* Itemized Table */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Itemized Schedule</h3>
-          <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
-            <table className="w-full text-left">
-              <thead className="bg-slate-100 text-slate-600 text-[10px] uppercase font-bold">
-                <tr>
-                  <th className="p-3">Product Specification</th>
-                  <th className="p-3">Quantity</th>
-                  <th className="p-3">Agreed Unit Price</th>
-                  <th className="p-3 text-right">Total Line Value</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-800">
-                <tr>
-                  <td className="p-3 font-semibold">{SEEDED_PRODUCT.name}</td>
-                  <td className="p-3">{formatNumber(qty)} units</td>
-                  <td className="p-3">{formatMoney(unitPrice, true)}/unit</td>
-                  <td className="p-3 text-right font-bold text-emerald-700">
-                    {formatMoney(lineTotal)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Terms & Conditions Summary */}
-        <div className="grid grid-cols-3 gap-3 text-xs">
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Delivery SLA</div>
-            <div className="font-bold text-slate-900 mt-1">{deal.deliveryDays} Calendar Days</div>
-          </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Payment Terms</div>
-            <div className="font-bold text-blue-700 mt-1">{deal.paymentTerms.toUpperCase()}</div>
-          </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Warranty</div>
-            <div className="font-bold text-slate-900 mt-1">12 Months Manufacturer Warranty</div>
-          </div>
-        </div>
-
-        {/* Cryptographic Checksum Banner */}
-        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+        {/* Immutable Cryptographic Verification */}
+        <div className="pt-4 border-t border-zinc-100 flex items-center justify-between font-mono text-[11px] text-zinc-400">
           <div className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-emerald-600" />
-            <span>SHA-256 Checksum: <strong className="text-slate-800">9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a</strong></span>
+            <Lock className="w-3 h-3 text-zinc-500" />
+            <span>SHA-256 Digest: 9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a</span>
           </div>
-          <span className="text-emerald-700 font-semibold font-sans">Verified by Decision Engine</span>
+          <span className="text-emerald-700 font-sans font-medium">Policy Engine Verified</span>
         </div>
+
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-300 transition-all"
-        >
-          Back to Deal Room
-        </button>
+      {/* Primary Action Button */}
+      <div className="flex items-center justify-end gap-4 pt-2">
         <button
           onClick={onProceedToPayment}
-          className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs flex items-center gap-2 transition-all"
+          className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
         >
-          <CreditCard className="w-4 h-4" /> Proceed to Razorpay Payment <ArrowRight className="w-4 h-4" />
+          Proceed to Razorpay Checkout <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
 
