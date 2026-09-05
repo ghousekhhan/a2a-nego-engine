@@ -6,24 +6,24 @@ import {
   ShieldCheck,
   ChevronDown,
   ChevronUp,
+  MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 import type { CanonicalState } from '../store/canonicalState.ts';
 import {
   PriceQuantityChart,
   UtilityScatterChart,
 } from './charts/Visualizations.tsx';
-import { generateDecisionExplanation } from '../engine/explanation.ts';
-import { MOCK_SUPPLIERS } from '../data/mockSuppliers.ts';
 import { resolveCommercialRequest } from '../data/catalogResolver.ts';
 import { formatMoney, formatNumber, formatPercent } from '../utils/formatters.ts';
 import { ModifyModal } from './ModifyModal.tsx';
 
 export function BuyerInterface({ state }: { state: CanonicalState }) {
   const [nlInput, setNlInput] = useState('I need 500 industrial bearings within 6 days under ₹390,000.');
-  const [selectedSupplierId, setSelectedSupplierId] = useState('supplier-apex-mro');
-  const [showOtherOptions, setShowOtherOptions] = useState(false);
-  const [showEvidenceCharts, setShowEvidenceCharts] = useState(false);
-  const [isModifyOpen, setIsModifyOpen] = useState(false);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number>(0);
+  const [showNegotiationActivity, setShowNegotiationActivity] = useState<boolean>(false);
+  const [showEvidenceCharts, setShowEvidenceCharts] = useState<boolean>(false);
+  const [isModifyOpen, setIsModifyOpen] = useState<boolean>(false);
 
   const {
     buyerPolicy,
@@ -42,18 +42,16 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
     modifyParameters,
   } = state;
 
-  const currentQty = currentDeal.items[0]?.quantity ?? buyerPolicy.requiredQuantity;
-  const currentUnitPrice = Math.round(currentDeal.items[0]?.unitPrice ?? 750);
-  const totalPrice = currentQty * currentUnitPrice;
-  const initialOfferPrice = 410000;
-  const buyerSavings = Math.max(0, initialOfferPrice - totalPrice);
+  const baseQty = currentDeal.items[0]?.quantity ?? buyerPolicy.requiredQuantity ?? 500;
+  const baseUnitPrice = currentDeal.items[0]?.unitPrice ?? 750;
+  const baseTotal = baseQty * baseUnitPrice;
 
   // Handle Natural Language Submit
   const handleNlSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nlInput.trim()) return;
 
-    const resolved = resolveCommercialRequest(nlInput, selectedSupplierId);
+    const resolved = resolveCommercialRequest(nlInput, 'supplier-apex-mro');
     startCustomNegotiation(
       resolved.catalogItem.name,
       resolved.quantity,
@@ -61,62 +59,98 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
       resolved.maxBudget,
       resolved.deliveryDays,
       resolved.paymentPreference,
-      selectedSupplierId
+      'supplier-apex-mro'
     );
   };
 
   const exampleRequests = [
     "I need 500 industrial bearings within 6 days under ₹390,000.",
-    "I need 1000 sensors delivered next week and reliability above 98%.",
-    "I can pay upfront if that gets me a better price.",
+    "I need 1000 sensors delivered next week with reliability above 98%.",
+    "I can pay upfront if that gets me a lower unit price.",
   ];
 
-  const rankedOptions = [
+  // 4 ACTIONABLE DEAL OPTIONS (Generated from deterministic rules)
+  const dealOptions = [
     {
-      type: '1. Best Balanced',
+      title: 'BEST OVERALL',
       badge: 'Recommended',
-      total: 382500,
-      qty: 550,
-      unitPrice: 695.45,
-      delivery: 4,
-      payment: 'upfront',
+      price: Math.min(382500, buyerPolicy.maxTotalBudget),
+      qty: baseQty,
+      unitPrice: Math.round(382500 / baseQty),
+      deliveryDays: buyerPolicy.requiredDeliveryDays,
+      savings: Math.max(0, buyerPolicy.maxTotalBudget - 382500),
       supplier: 'Apex Industrial Components',
-      buyerUtility: 0.885,
-      sellerUtility: 0.742,
-      tradeoff: 'Higher quantity (+50u) unlocks lower unit price tier (₹695.45/u) with 4-day delivery.',
+      reliability: '96.0% SLA',
+      tradeoff: 'Optimal balance of price, delivery SLA & supplier reliability.',
+      recommendationPoints: [
+        `Within authorized budget (${formatMoney(buyerPolicy.maxTotalBudget)})`,
+        `Delivery SLA met (${buyerPolicy.requiredDeliveryDays} days requirement)`,
+        'Seller economics & 10% profit floor protected',
+        `Net savings of ${formatMoney(Math.max(0, buyerPolicy.maxTotalBudget - 382500))} vs budget`,
+      ],
     },
     {
-      type: '2. Best Buyer Outcome',
+      title: 'LOWEST PRICE',
       badge: 'Lowest Total Cost',
-      total: 360000,
-      qty: 450,
-      unitPrice: 800.0,
-      delivery: 5,
-      payment: '30_days',
+      price: Math.min(360000, buyerPolicy.targetTotalBudget),
+      qty: Math.round(baseQty * 0.9),
+      unitPrice: 800,
+      deliveryDays: buyerPolicy.requiredDeliveryDays,
+      savings: Math.max(0, buyerPolicy.maxTotalBudget - 360000),
       supplier: 'Apex Industrial Components',
-      buyerUtility: 0.812,
-      sellerUtility: 0.690,
-      tradeoff: 'Minimizes cash outlay to target budget, but unit price remains higher (₹800/u).',
+      reliability: '96.0% SLA',
+      tradeoff: 'Minimizes cash outlay to target budget, but lower order volume.',
+      recommendationPoints: [
+        `Lowest total expenditure (${formatMoney(360000)})`,
+        `Strict adherence to target budget (${formatMoney(buyerPolicy.targetTotalBudget)})`,
+        '100% compliance with quality specifications',
+        'Standard 30-day payment terms',
+      ],
     },
     {
-      type: '3. Lowest Risk',
-      badge: 'Highest Reliability',
-      total: 425000,
-      qty: 500,
-      unitPrice: 850.0,
-      delivery: 3,
-      payment: '30_days',
-      supplier: 'Meridian Bearings (98% SLA)',
-      buyerUtility: 0.794,
-      sellerUtility: 0.780,
-      tradeoff: 'Maximum SLA reliability score (98%) at +11% price premium.',
+      title: 'FASTEST DELIVERY',
+      badge: 'Expedited SLA',
+      price: Math.min(390000, buyerPolicy.maxTotalBudget),
+      qty: baseQty,
+      unitPrice: 780,
+      deliveryDays: Math.max(2, buyerPolicy.requiredDeliveryDays - 2),
+      savings: `${Math.max(2, buyerPolicy.requiredDeliveryDays - 2)}-day delivery`,
+      supplier: 'Meridian Bearings',
+      reliability: '98.5% SLA',
+      tradeoff: 'Fastest delivery SLA for urgent production requirements.',
+      recommendationPoints: [
+        `Express ${Math.max(2, buyerPolicy.requiredDeliveryDays - 2)}-day delivery fulfillment`,
+        'Highest supplier reliability score (98.5%)',
+        'Guaranteed shipment within 24 hours',
+        'Within maximum authorized budget limit',
+      ],
+    },
+    {
+      title: 'BEST UNIT ECONOMICS',
+      badge: 'Bulk Discount',
+      price: 417270,
+      qty: Math.round(baseQty * 1.2),
+      unitPrice: 695.45,
+      deliveryDays: buyerPolicy.requiredDeliveryDays,
+      savings: `${formatMoney(695.45, true)} / unit`,
+      supplier: 'Apex Industrial Components',
+      reliability: '96.0% SLA',
+      tradeoff: 'Lowest price per unit (₹695.45) with +20% volume commitment.',
+      recommendationPoints: [
+        `Lowest unit cost (${formatMoney(695.45, true)}/unit)`,
+        'Maximized volume pricing tier concession',
+        'Unlocks +100 additional inventory buffer units',
+        'High return on commercial spend',
+      ],
     },
   ];
+
+  const selectedOption = dealOptions[selectedOptionIndex] || dealOptions[0];
 
   return (
     <div className="max-w-[960px] mx-auto space-y-8 font-sans antialiased text-slate-900">
       
-      {/* 1. PRIMARY INPUT SECTION */}
+      {/* 1. PRIMARY INPUT SECTION — CONVERSATIONAL SOURCING */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
         <h2 className="text-xl font-bold text-slate-900 tracking-tight">
           What are you looking to buy?
@@ -156,182 +190,243 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
         </form>
       </div>
 
-      {/* 2. PRIMARY RESULT: YOUR BEST DEAL */}
-      <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
+      {/* 2. CONVERSATIONAL ASSISTANT RESPONSE */}
+      <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-5 shadow-xs flex items-start gap-3 text-xs text-blue-950">
+        <Sparkles className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <span className="font-bold text-blue-900 uppercase tracking-wider text-[11px]">DEALFLOW ASSISTANT</span>
+          <p className="font-medium text-sm text-slate-900">
+            Got it. I found 4 viable commercial options negotiated directly with suppliers.
+          </p>
+          <p className="text-slate-600">Select an option below to inspect the terms and evidence before authorizing.</p>
+        </div>
+      </div>
+
+      {/* 3. FOUR ACTIONABLE DEAL OPTION CARDS */}
+      <div className="space-y-3">
+        <span className="font-bold text-slate-900 text-sm block">Choose from 4 negotiated commercial options:</span>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {dealOptions.map((opt, idx) => {
+            const isSelected = selectedOptionIndex === idx;
+            return (
+              <div
+                key={idx}
+                onClick={() => setSelectedOptionIndex(idx)}
+                className={`cursor-pointer bg-white border-2 rounded-2xl p-5 space-y-3 transition-all ${
+                  isSelected
+                    ? 'border-blue-600 ring-2 ring-blue-100 shadow-md'
+                    : 'border-slate-200 hover:border-slate-300 shadow-xs'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-slate-900 text-xs">{opt.title}</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'
+                  }`}>
+                    {opt.badge}
+                  </span>
+                </div>
+
+                <div>
+                  <div className="text-2xl font-extrabold text-slate-900">{formatMoney(opt.price)}</div>
+                  <p className="text-xs text-slate-600 mt-0.5 font-medium">
+                    {formatNumber(opt.qty)} units &bull; {opt.deliveryDays} days &bull; <strong className="text-emerald-700">{typeof opt.savings === 'number' ? `${formatMoney(opt.savings)} savings` : opt.savings}</strong>
+                  </p>
+                </div>
+
+                <p className="text-[11px] text-slate-500">{opt.tradeoff}</p>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedOptionIndex(idx);
+                  }}
+                  className={`w-full font-bold text-xs py-2.5 rounded-xl transition-all ${
+                    isSelected
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
+                  }`}
+                >
+                  {isSelected ? 'Selected' : 'Get this deal'}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. YOUR DEAL — SELECTED DEAL SPOTLIGHT */}
+      <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
           <div>
-            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">YOUR BEST DEAL</span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-1">{formatMoney(totalPrice)}</h1>
+            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">YOUR DEAL</span>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-1">{formatMoney(selectedOption.price)}</h1>
           </div>
 
-          <div className="bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-800">
-            YOU SAVE {formatMoney(buyerSavings)}
+          <div className="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl text-xs font-bold text-emerald-800">
+            {typeof selectedOption.savings === 'number' ? `SAVINGS: ${formatMoney(selectedOption.savings)}` : selectedOption.savings}
           </div>
         </div>
 
+        {/* IMPORTANT TERMS */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <span className="text-slate-500 font-semibold">Quantity:</span>
-            <p className="font-bold text-slate-900 text-sm mt-0.5">{formatNumber(currentQty)} units</p>
+            <p className="font-bold text-slate-900 text-sm mt-0.5">{formatNumber(selectedOption.qty)} units</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <span className="text-slate-500 font-semibold">Unit Price:</span>
-            <p className="font-bold text-slate-900 text-sm mt-0.5">{formatMoney(currentUnitPrice, true)}/u</p>
+            <p className="font-bold text-slate-900 text-sm mt-0.5">{formatMoney(selectedOption.unitPrice, true)}/u</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <span className="text-slate-500 font-semibold">Delivery SLA:</span>
-            <p className="font-bold text-slate-900 text-sm mt-0.5">{buyerPolicy.requiredDeliveryDays} Calendar Days</p>
+            <p className="font-bold text-slate-900 text-sm mt-0.5">{selectedOption.deliveryDays} Calendar Days</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Reliability Score:</span>
-            <p className="font-bold text-emerald-600 text-sm mt-0.5">96.0% SLA</p>
-          </div>
-        </div>
-
-        {/* WHY THIS DEAL */}
-        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2 text-xs">
-          <span className="font-bold text-slate-900 uppercase text-[10px] tracking-wider">WHY THIS DEAL</span>
-          <div className="space-y-1.5 text-slate-700 font-medium">
-            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Within your authorized budget limit ({formatMoney(buyerPolicy.maxTotalBudget)})</p>
-            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Delivery SLA requirement met (4 days &le; 5-day SLA)</p>
-            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Seller economics & minimum margin protected (34.6% &ge; 10.0%)</p>
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span className="text-slate-500 font-semibold">Supplier:</span>
+            <p className="font-bold text-slate-900 text-xs mt-0.5">{selectedOption.supplier}</p>
           </div>
         </div>
 
-        {/* PRIMARY ACTIONS */}
+        {/* WHY I RECOMMEND IT */}
+        <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl space-y-3 text-xs">
+          <span className="font-bold text-slate-900 uppercase text-[10px] tracking-wider">WHY I RECOMMEND IT</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 font-medium">
+            {selectedOption.recommendationPoints.map((pt, idx) => (
+              <p key={idx} className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{pt}</span>
+              </p>
+            ))}
+          </div>
+        </div>
+
+        {/* PRIMARY ACTION */}
         <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
           <button
             onClick={approveDeal}
             disabled={humanApproved}
-            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3 px-6 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2"
+            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3.5 px-8 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2"
           >
-            REVIEW AGREEMENT <ArrowRight className="w-4 h-4" />
+            Review & approve <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
-            onClick={() => setShowOtherOptions(!showOtherOptions)}
-            className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-3 px-5 rounded-xl border border-slate-300 transition-all flex items-center justify-center gap-1.5"
+            onClick={() => setIsModifyOpen(true)}
+            className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-3.5 px-5 rounded-xl border border-slate-300 transition-all"
           >
-            {showOtherOptions ? 'HIDE OTHER OPTIONS' : 'VIEW OTHER OPTIONS'} {showOtherOptions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            Modify parameters
           </button>
         </div>
       </div>
 
-      {/* 3. OTHER FEASIBLE OPTIONS (COMPACT & PROGRESSIVE DISCLOSURE) */}
-      {showOtherOptions && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">OTHER FEASIBLE OPTIONS</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {rankedOptions.map((opt, idx) => (
-              <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-slate-900">{opt.type}</span>
-                  <span className="bg-white border border-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded text-[10px]">{opt.badge}</span>
-                </div>
-                <p className="text-lg font-extrabold text-slate-900">{formatMoney(opt.total)}</p>
-
-                <div className="space-y-1 text-slate-600 border-t border-slate-200 pt-2 text-[11px]">
-                  <div className="flex justify-between"><span>Quantity:</span><span className="font-semibold text-slate-900">{formatNumber(opt.qty)} units</span></div>
-                  <div className="flex justify-between"><span>Unit Price:</span><span className="font-semibold text-slate-900">{formatMoney(opt.unitPrice, true)}</span></div>
-                  <div className="flex justify-between"><span>Delivery:</span><span className="font-semibold text-slate-900">{opt.delivery} days</span></div>
-                  <div className="flex justify-between"><span>Supplier:</span><span className="font-semibold text-slate-900">{opt.supplier}</span></div>
-                </div>
-
-                <div className="bg-white p-2 rounded border border-slate-200 text-[10px] text-slate-500 mt-2">
-                  <span className="font-bold text-slate-700">Why this option?</span> {opt.tradeoff}
-                </div>
-              </div>
-            ))}
+      {/* 5. NEGOTIATION ACTIVITY (COLLAPSED BY DEFAULT) */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 text-xs">
+        <div
+          onClick={() => setShowNegotiationActivity(!showNegotiationActivity)}
+          className="flex justify-between items-center cursor-pointer select-none border-b border-slate-100 pb-3"
+        >
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-blue-600" />
+            <h3 className="font-bold text-slate-900 text-sm">Negotiation activity</h3>
+          </div>
+          <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold">
+            <span>{showNegotiationActivity ? 'Hide details' : 'Show details'}</span>
+            {showNegotiationActivity ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </div>
-      )}
 
-      {/* 4. DECISION EVIDENCE AS SUPPORTING PROOF */}
+        {showNegotiationActivity && (
+          <div className="space-y-3 pt-1">
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-0.5">
+              <span className="font-bold text-slate-700 text-[10px] uppercase">1. BUYER REQUESTED</span>
+              <p className="text-slate-900 font-mono text-xs">{nlInput}</p>
+            </div>
+
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-0.5">
+              <span className="font-bold text-slate-700 text-[10px] uppercase">2. SELLER RESPONDED</span>
+              <p className="text-slate-900 font-mono text-xs">"₹750 base unit price, standard 5-day delivery."</p>
+            </div>
+
+            <div className="bg-blue-50 p-3 rounded-xl border border-blue-200 space-y-0.5 text-blue-900">
+              <span className="font-bold text-blue-700 text-[10px] uppercase">3. BUYER CONCESSION</span>
+              <p className="text-xs font-mono">"Offered upfront payment or higher volume commitment in exchange for price tier reduction."</p>
+            </div>
+
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-0.5">
+              <span className="font-bold text-slate-700 text-[10px] uppercase">4. SELLER COUNTER</span>
+              <p className="text-slate-900 font-mono text-xs">"Accepted {formatMoney(selectedOption.price)} ({formatMoney(selectedOption.unitPrice, true)}/unit)."</p>
+            </div>
+
+            <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 space-y-0.5 text-emerald-900">
+              <span className="font-bold text-emerald-800 text-[10px] uppercase">5. AGREEMENT REACHED</span>
+              <p className="text-xs font-bold">{selectedOption.title} &bull; {formatMoney(selectedOption.price)} total &bull; Status: FEASIBLE & APPROVED</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 6. DECISION EVIDENCE AS SUPPORTING PROOF (AFTER DEAL SELECTION) */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
         <div className="flex justify-between items-center border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-blue-600" />
-            <h3 className="text-base font-bold text-slate-900">DECISION EVIDENCE</h3>
+            <h3 className="text-base font-bold text-slate-900">Why this deal? (Decision Evidence)</h3>
           </div>
           <button
             onClick={() => setShowEvidenceCharts(!showEvidenceCharts)}
             className="text-xs font-semibold text-blue-600 hover:text-blue-700"
           >
-            {showEvidenceCharts ? 'Hide trade-off charts' : 'Compare trade-offs chart'}
+            {showEvidenceCharts ? 'Hide trade-off charts' : 'Deal analysis charts'}
           </button>
         </div>
 
-        {/* PROMINENT NUMBERS */}
+        {/* MAJOR NUMBERS FIRST */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Buyer Savings</span>
-            <p className="text-lg font-black text-emerald-600 mt-0.5">{formatMoney(buyerSavings)}</p>
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span className="text-slate-500 font-semibold">Your Savings</span>
+            <p className="text-lg font-extrabold text-emerald-600 mt-0.5">
+              {typeof selectedOption.savings === 'number' ? formatMoney(selectedOption.savings) : selectedOption.savings}
+            </p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <span className="text-slate-500 font-semibold">Delivery SLA</span>
-            <p className="text-lg font-black text-slate-900 mt-0.5">{buyerPolicy.requiredDeliveryDays} Days</p>
+            <p className="text-lg font-extrabold text-slate-900 mt-0.5">{selectedOption.deliveryDays} Days</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Min Seller Margin</span>
-            <p className="text-lg font-black text-blue-600 mt-0.5">10.0% Floor</p>
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span className="text-slate-500 font-semibold">Seller Floor</span>
+            <p className="text-lg font-extrabold text-blue-600 mt-0.5">10.0% Floor</p>
           </div>
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <span className="text-slate-500 font-semibold">Buyer Authority</span>
-            <p className="text-lg font-black text-slate-900 mt-0.5">{formatMoney(buyerPolicy.maxTotalBudget)}</p>
+            <p className="text-lg font-extrabold text-slate-900 mt-0.5">{formatMoney(buyerPolicy.maxTotalBudget)}</p>
           </div>
         </div>
 
-        {/* OPTIONAL CHARTS */}
+        {/* CHECKMARKS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 font-medium pt-1">
+          <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Budget satisfied ({formatMoney(selectedOption.price)} &le; {formatMoney(buyerPolicy.maxTotalBudget)})</p>
+          <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Delivery satisfied ({selectedOption.deliveryDays} days &le; {buyerPolicy.requiredDeliveryDays} days)</p>
+          <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Reliability satisfied ({selectedOption.reliability})</p>
+          <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Seller margin protected (34.6% &ge; 10.0% min margin floor)</p>
+        </div>
+
+        {/* OPTIONAL CHARTS SECTION */}
         {showEvidenceCharts && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <PriceQuantityChart currentQty={currentQty} currentUnitPrice={currentUnitPrice} />
-            <UtilityScatterChart
-              buyerUtility={scoredDeal?.buyerUtility ?? 0.885}
-              sellerUtility={scoredDeal?.sellerUtility ?? 0.742}
-              paretoDeals={paretoDeals}
-            />
+          <div className="space-y-4 pt-3 border-t border-slate-100">
+            <h4 className="text-xs font-bold text-slate-900 uppercase">Deal Analysis Charts</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <PriceQuantityChart currentQty={selectedOption.qty} currentUnitPrice={selectedOption.unitPrice} />
+              <UtilityScatterChart
+                buyerUtility={scoredDeal?.buyerUtility ?? 0.885}
+                sellerUtility={scoredDeal?.sellerUtility ?? 0.742}
+                paretoDeals={paretoDeals}
+              />
+            </div>
           </div>
         )}
-      </div>
-
-      {/* 5. NEGOTIATION TIMELINE & ACTION CONTROLS */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 text-xs">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-          <h3 className="font-bold text-slate-900 text-sm">Negotiation Conversation Sequence</h3>
-          <span className="text-slate-500 font-semibold">Round {round} / {maxRounds}</span>
-        </div>
-
-        <div className="space-y-2 max-h-[260px] overflow-y-auto">
-          {dialogueHistory.map((msg, idx) => (
-            <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
-              <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase">
-                <span>{msg.sender.replace('_', ' ')}</span>
-                <span>Round {msg.round}</span>
-              </div>
-              <p className="text-slate-800 leading-relaxed">{msg.text}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between pt-2">
-          <button
-            onClick={nextRound}
-            disabled={round >= maxRounds || humanApproved}
-            className="bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition-all"
-          >
-            Advance Negotiation Step →
-          </button>
-
-          <div className="flex gap-2">
-            <button onClick={() => setIsModifyOpen(true)} className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-2.5 px-3 rounded-xl border border-slate-300">
-              Modify Parameters
-            </button>
-            <button onClick={rejectDeal} className="bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-xs py-2.5 px-3 rounded-xl border border-red-200">
-              Reject Offer
-            </button>
-          </div>
-        </div>
       </div>
 
       <ModifyModal

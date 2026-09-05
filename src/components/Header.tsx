@@ -73,7 +73,7 @@ export function Header({
             <div className="bg-blue-600 text-white p-1.5 rounded-lg font-bold">
               <Zap className="w-4 h-4" />
             </div>
-            <span className="font-bold text-slate-900 text-base tracking-tight">A2A Deal Engine</span>
+            <span className="font-bold text-slate-900 text-base tracking-tight">A2A DealFlow</span>
           </div>
         </div>
 
@@ -100,7 +100,10 @@ export function Header({
               <ArrowLeft className="w-3 h-3" /> Overview
             </button>
             <button
-              onClick={() => setRole('buyer')}
+              onClick={() => {
+                setRole('buyer');
+                setActiveTab('control_room');
+              }}
               className={`px-3 py-1 rounded transition-all ${
                 role === 'buyer' ? 'bg-white text-blue-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
@@ -108,7 +111,10 @@ export function Header({
               Buyer View
             </button>
             <button
-              onClick={() => setRole('seller')}
+              onClick={() => {
+                setRole('seller');
+                setActiveTab('control_room');
+              }}
               className={`px-3 py-1 rounded transition-all ${
                 role === 'seller' ? 'bg-white text-emerald-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
@@ -116,7 +122,10 @@ export function Header({
               Seller View
             </button>
             <button
-              onClick={() => setRole('admin')}
+              onClick={() => {
+                setRole('admin');
+                setActiveTab('control_room');
+              }}
               className={`px-3 py-1 rounded transition-all ${
                 role === 'admin' ? 'bg-white text-purple-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
@@ -136,7 +145,7 @@ export function Header({
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-all"
             >
-              TRY THE DEAL ENGINE
+              TRY DEALFLOW
             </button>
           ) : (
             <div className="flex items-center gap-2">

@@ -41,7 +41,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
         key: 'rzp_test_a2a_deal_engine',
         amount: amountPaise,
         currency: 'INR',
-        name: 'A2A Deal Engine Settlement',
+        name: 'A2A DealFlow Settlement',
         description: `Payment for Approved Contract (${qty} units @ ${formatMoney(unitPrice, true)})`,
         order_id: generatedOrderId,
         handler: function (response: any) {
@@ -53,7 +53,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
         },
         prefill: {
           name: 'Procurement Manager',
-          email: 'procurement@a2adealengine.com',
+          email: 'procurement@a2adealflow.com',
           contact: '9999999999',
         },
         theme: {

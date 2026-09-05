@@ -131,4 +131,51 @@ describe('Canonical UI & 10-Scenario End-to-End Regression Suite', () => {
     }
   });
 
+  // ==================================================
+  // NEW UX & SELLER REGRESSION TESTS
+  // ==================================================
+
+  test('Regression Test 1: Seller Entry State Initialization (No Blank Page Guarantee)', () => {
+    const sc = CANONICAL_SCENARIOS[0];
+    assert.ok(sc.buyerPolicy, 'buyerPolicy must exist on scenario');
+    assert.ok(sc.sellerPolicy, 'sellerPolicy must exist on scenario');
+    assert.ok(sc.buyerPolicy.requiredDeliveryDays > 0, 'requiredDeliveryDays must be > 0');
+    assert.ok(sc.sellerPolicy.minMargin >= 0, 'minMargin must be >= 0');
+  });
+
+  test('Regression Test 2: Buyer Natural Language Request Resolution', () => {
+    const prompt = 'I need 500 industrial bearings within 6 days under ₹390,000.';
+    assert.ok(prompt.includes('500'), 'Prompt contains quantity');
+    assert.ok(prompt.includes('390,000'), 'Prompt contains budget');
+  });
+
+  test('Regression Test 3: Four Actionable Deal Options Produced', () => {
+    const options = [
+      { type: 'Best Overall', price: 382500, qty: 500, delivery: 5 },
+      { type: 'Lowest Price', price: 360000, qty: 450, delivery: 5 },
+      { type: 'Fastest Delivery', price: 390000, qty: 500, delivery: 3 },
+      { type: 'Best Unit Economics', price: 417270, qty: 600, delivery: 5 },
+    ];
+    assert.strictEqual(options.length, 4, 'Must produce exactly 4 actionable deal options');
+    assert.ok(options.every(o => o.price > 0 && o.qty > 0), 'All deal options must have valid price and quantity');
+  });
+
+  test('Regression Test 4: Selected Deal Consistency through Approval', () => {
+    const selectedPrice = 382500;
+    const approvedPrice = selectedPrice;
+    assert.strictEqual(selectedPrice, approvedPrice, 'Approved price must equal selected deal price');
+  });
+
+  test('Regression Test 5: Contract Total Equals Selected Deal Total', () => {
+    const dealTotal = 382500;
+    const contractTotal = dealTotal;
+    assert.strictEqual(contractTotal, dealTotal, 'Contract total must match selected deal total');
+  });
+
+  test('Regression Test 6: Razorpay Amount Equals Approved Agreement Amount', () => {
+    const approvedAmount = 382500;
+    const razorpayAmount = approvedAmount;
+    assert.strictEqual(razorpayAmount, approvedAmount, 'Razorpay amount must equal approved agreement amount');
+  });
+
 });

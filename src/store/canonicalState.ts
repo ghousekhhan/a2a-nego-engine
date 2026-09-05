@@ -65,8 +65,13 @@ export interface CanonicalState {
 }
 
 export function useCanonicalState(): CanonicalState {
-  const [role, setRole] = useState<UserRole>('landing');
+  const [role, setRoleState] = useState<UserRole>('landing');
   const [activeTab, setActiveTab] = useState<ViewTab>('control_room');
+
+  const setRole = useCallback((newRole: UserRole) => {
+    setRoleState(newRole);
+    setActiveTab('control_room');
+  }, []);
   const [activeScenario, setActiveScenario] = useState<CanonicalScenario>(CANONICAL_SCENARIOS[0]);
   const [round, setRound] = useState<number>(1);
   const [maxRounds] = useState<number>(4);

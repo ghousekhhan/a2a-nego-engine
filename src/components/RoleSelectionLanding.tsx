@@ -4,10 +4,14 @@ import {
   ShieldCheck,
   CheckCircle2,
   Check,
-  ArrowDown,
+  Zap,
+  Building2,
+  Users,
+  BarChart3,
 } from 'lucide-react';
 import type { UserRole } from '../store/canonicalState.ts';
 import { CANONICAL_SCENARIOS } from '../data/canonicalScenarios.ts';
+import { formatMoney, formatNumber } from '../utils/formatters.ts';
 
 interface RoleSelectionLandingProps {
   onSelectRole: (role: UserRole) => void;
@@ -20,223 +24,211 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const interactiveOptions = [
+    {
+      title: 'BEST OVERALL',
+      badge: 'Recommended',
+      price: 382500,
+      qty: 500,
+      delivery: '5 days',
+      savings: '₹7,500 savings',
+      tradeoff: 'Optimal balance of price, delivery SLA & supplier reliability.',
+      scenarioId: 'scenario-01',
+    },
+    {
+      title: 'LOWEST PRICE',
+      badge: 'Lowest Cost',
+      price: 360000,
+      qty: 450,
+      delivery: '5 days',
+      savings: '₹30,000 savings',
+      tradeoff: 'Minimizes total cash outlay to target budget limit.',
+      scenarioId: 'scenario-02',
+    },
+    {
+      title: 'FASTEST DELIVERY',
+      badge: 'Expedited SLA',
+      price: 390000,
+      qty: 500,
+      delivery: '3 days',
+      savings: '3-day express',
+      tradeoff: 'Priority fulfillment for emergency sourcing requirements.',
+      scenarioId: 'scenario-06',
+    },
+    {
+      title: 'BEST UNIT ECONOMICS',
+      badge: 'Bulk Discount',
+      price: 417270,
+      qty: 600,
+      delivery: '5 days',
+      savings: '₹695.45 / unit',
+      tradeoff: 'Unlocks maximum volume discount tier per unit.',
+      scenarioId: 'scenario-03',
+    },
+  ];
+
   return (
-    <div className="max-w-[1040px] mx-auto py-10 px-4 space-y-24 font-sans antialiased text-slate-900">
+    <div className="max-w-[1040px] mx-auto py-8 px-4 space-y-20 font-sans antialiased text-slate-900">
       
       {/* ================================================== */}
-      {/* 4. HERO SECTION */}
+      {/* 1. HERO SECTION */}
       {/* ================================================== */}
       <section className="text-center space-y-6 pt-4 max-w-3xl mx-auto">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
-          A2A Deal Engine
+        <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block">
+          A2A DealFlow
         </span>
         
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 leading-tight">
-          Let AI negotiate the deal.<br />You stay in control.
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+          Let your AI negotiate the deal.
         </h1>
         
         <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed max-w-2xl mx-auto">
-          Buyer and seller agents negotiate price, quantity, delivery and payment terms automatically. Our deterministic Decision Engine makes sure every proposed agreement stays within the commercial rules set by the business.
+          Buyer and seller agents negotiate price, quantity, delivery and payment in real time. DealFlow evaluates every proposal against the commercial rules set by both sides and puts the final agreement in human hands.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <button
-            onClick={() => scrollToSection('try-section')}
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-3 px-6 rounded-lg transition-all shadow-2xs"
+            onClick={() => {
+              onSelectRole('buyer');
+            }}
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-3 px-6 rounded-xl transition-all shadow-2xs"
           >
-            TRY THE DEAL ENGINE
+            TRY DEALFLOW
           </button>
           <button
             onClick={() => scrollToSection('how-it-works')}
-            className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-3 px-6 rounded-lg border border-slate-300 transition-all"
+            className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-3 px-6 rounded-xl border border-slate-300 transition-all"
           >
-            SEE HOW IT WORKS
+            HOW IT WORKS
           </button>
         </div>
 
-        <p className="text-xs text-slate-500 font-medium pt-3">
-          Agents negotiate. Rules protect the economics. Humans authorize. Razorpay executes.
+        <p className="text-xs text-slate-500 font-semibold pt-2">
+          AI negotiates. Rules protect the economics. Humans approve.
         </p>
       </section>
 
       {/* ================================================== */}
-      {/* 5. HERO VISUAL — ELEGANT PRODUCT INTERACTION PREVIEW */}
+      {/* 2. INTERACTIVE PRODUCT PREVIEW */}
       {/* ================================================== */}
-      <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs max-w-2xl mx-auto space-y-4 text-xs font-sans">
-        <div className="text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
-          Product Preview — Autonomous Commercial Pipeline
+      <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs max-w-3xl mx-auto space-y-6 text-xs font-sans">
+        <div className="text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3">
+          Interactive Product Preview
         </div>
 
-        <div className="space-y-3">
-          <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-1">
-            <span className="font-bold text-slate-700 text-[11px]">BUYER REQUEST</span>
-            <p className="font-mono text-slate-900 text-xs">"I need 500 industrial bearings within 6 days under ₹390,000."</p>
+        <div className="space-y-4">
+          {/* USER STATEMENT */}
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-1">
+            <span className="font-bold text-slate-700 text-[11px] uppercase">USER</span>
+            <p className="font-mono text-slate-900 text-sm font-semibold">
+              "I need 500 industrial bearings within 6 days under ₹390,000."
+            </p>
           </div>
 
-          <div className="flex justify-center text-slate-300">↓</div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50 border border-blue-200 p-3 rounded-xl">
-              <span className="font-bold text-blue-700 text-[11px] block">BUYER AGENT</span>
-              <span className="text-slate-700 text-[11px]">Finds viable suppliers & formulates counter-offers</span>
-            </div>
-            <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
-              <span className="font-bold text-emerald-700 text-[11px] block">SELLER AGENT</span>
-              <span className="text-slate-700 text-[11px]">Evaluates margin & proposes concessions</span>
-            </div>
+          {/* DEALFLOW RESPONSE */}
+          <div className="bg-blue-50/70 border border-blue-200 p-4 rounded-xl space-y-1 text-blue-950">
+            <span className="font-bold text-blue-700 text-[11px] uppercase">DEALFLOW</span>
+            <p className="text-xs font-medium">
+              Got it. I'm checking available suppliers and negotiating the best commercial options.
+            </p>
           </div>
 
-          <div className="flex justify-center text-slate-300">↓</div>
+          <div className="pt-2">
+            <span className="font-bold text-slate-900 text-xs block mb-3">I found 4 viable commercial options:</span>
 
-          <div className="bg-purple-50 border border-purple-200 p-3.5 rounded-xl space-y-1.5 text-[11px]">
-            <span className="font-bold text-purple-800 block">DECISION ENGINE (RULES CHECK)</span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-purple-900 font-semibold">
-              <span>✓ Budget &le; ₹390,000</span>
-              <span>✓ Seller Margin &ge; 10%</span>
-              <span>✓ Delivery &le; 6 Days</span>
-              <span>✓ Spend &le; Authority</span>
+            {/* 4 ACTIONABLE DEAL OPTIONS CARDS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {interactiveOptions.map((opt, idx) => (
+                <div key={idx} className="bg-white border border-slate-200 hover:border-blue-400 rounded-xl p-4 space-y-2 flex flex-col justify-between transition-all">
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-slate-900 text-[11px]">{opt.title}</span>
+                      <span className="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded text-[10px]">{opt.badge}</span>
+                    </div>
+                    <div className="text-xl font-extrabold text-slate-900">{formatMoney(opt.price)}</div>
+                    <p className="text-[11px] text-slate-600">
+                      {formatNumber(opt.qty)} units &bull; {opt.delivery} &bull; <strong className="text-emerald-700">{opt.savings}</strong>
+                    </p>
+                    <p className="text-[10px] text-slate-500 pt-1">{opt.tradeoff}</p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      onSelectScenario(opt.scenarioId);
+                      onSelectRole('buyer');
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] py-2 rounded-lg transition-all mt-2"
+                  >
+                    Get this deal
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
-
-          <div className="flex justify-center text-slate-300">↓</div>
-
-          <div className="bg-white border-2 border-emerald-500 p-4 rounded-xl flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold text-emerald-700 uppercase">AGREED COMMERCIAL DEAL</span>
-              <div className="text-lg font-bold text-slate-900">₹3,82,500</div>
-              <div className="text-[11px] text-slate-500">550 units @ ₹695.45/u | 4-day delivery | Upfront</div>
-            </div>
-            <button
-              onClick={() => {
-                onSelectScenario('scenario-01');
-                onSelectRole('buyer');
-              }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-2xs"
-            >
-              Review agreement
-            </button>
           </div>
         </div>
       </section>
 
       {/* ================================================== */}
-      {/* 6. WHAT WE ACTUALLY DO */}
+      {/* 3. WHAT DEALFLOW DOES (NEGOTIATE, EVALUATE, APPROVE) */}
       {/* ================================================== */}
-      <section id="product-section" className="space-y-8 pt-6 border-t border-slate-200">
+      <section id="what-it-does" className="space-y-8 pt-6 border-t border-slate-200">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">WHAT DEALFLOW DOES</span>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Negotiation, without the manual back-and-forth.
+            Commercial negotiation built for speed & safety.
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-2">
-            <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">NEGOTIATE</span>
+            <span className="text-xs font-mono font-bold text-blue-600">01 &bull; NEGOTIATE</span>
+            <h3 className="text-base font-bold text-slate-900">AI Agents Negotiate</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Buyer and seller agents exchange offers and concessions instead of relying on endless email and calls.
+              AI buyer and seller agents exchange offers, volume discounts, and delivery SLA concessions in real time.
             </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-2">
-            <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">PROTECT</span>
+            <span className="text-xs font-mono font-bold text-purple-600">02 &bull; EVALUATE</span>
+            <h3 className="text-base font-bold text-slate-900">Decision Engine Evaluates</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              The Decision Engine evaluates every proposal against budget, margin, delivery, quantity and authority.
+              The Decision Engine checks budget, minimum profit margin, delivery timeline, quantity, and authority limits.
             </p>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-2">
-            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">AUTHORIZE</span>
+            <span className="text-xs font-mono font-bold text-emerald-600">03 &bull; APPROVE</span>
+            <h3 className="text-base font-bold text-slate-900">Human Approves</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Humans remain in control of the final agreement before payment is executed through Razorpay.
+              A human reviews the agreement and evidence before execution via Razorpay sandbox payment.
             </p>
           </div>
+        </div>
+
+        <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-xs text-slate-800 font-bold text-center">
+          AI negotiates. Rules protect the economics. Humans approve.
         </div>
       </section>
 
       {/* ================================================== */}
-      {/* 7. THE PROBLEM */}
+      {/* 4. WHY THIS MATTERS */}
       {/* ================================================== */}
       <section className="space-y-6 pt-6 border-t border-slate-200">
         <div className="max-w-2xl space-y-3">
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Buying at the right price is more than finding the lowest price.
+            B2B negotiation is slow and trade-offs are difficult.
           </h2>
           <p className="text-xs text-slate-600 leading-relaxed">
-            A supplier offering the lowest unit price may have poor delivery SLA, insufficient reliability, unacceptable profit margins, limited stock, or strict payment constraints. Buyers and sellers optimize fundamentally different commercial variables.
+            A supplier offering the lowest unit price may have poor delivery SLA, insufficient reliability, unacceptable profit margins, or strict payment constraints. Buyers and sellers optimize fundamentally different commercial variables.
           </p>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Traditional procurement forces humans to manually resolve these trade-offs through long phone calls and emails. <strong>A2A Deal Engine lets agents negotiate those economic trade-offs directly.</strong>
+            Traditional procurement forces humans to manually resolve these trade-offs through long phone calls and email chains. <strong>A2A DealFlow lets agents negotiate economic trade-offs directly while deterministic rules protect your business.</strong>
           </p>
         </div>
       </section>
 
       {/* ================================================== */}
-      {/* 8. SHOW THE PRODUCT — ONE DEAL NEGOTIATED IN SECONDS */}
-      {/* ================================================== */}
-      <section className="space-y-6 pt-6 border-t border-slate-200">
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            One deal. Negotiated in seconds.
-          </h2>
-          <p className="text-xs text-slate-500">Actual output calculated by the deterministic Decision Engine.</p>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-xl mx-auto space-y-3 text-xs">
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-0.5">
-            <span className="font-bold text-slate-700">BUYER:</span>
-            <p className="text-slate-900 font-mono">"I need 500 bearings within 6 days under ₹390,000."</p>
-          </div>
-
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-0.5">
-            <span className="font-bold text-slate-700">SELLER:</span>
-            <p className="text-slate-900 font-mono">"₹750 per unit, delivery in 5 days."</p>
-          </div>
-
-          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 space-y-0.5 text-blue-900">
-            <span className="font-bold text-blue-700">BUYER AGENT:</span>
-            <p>"Can improve price if quantity increases."</p>
-          </div>
-
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-0.5">
-            <span className="font-bold text-slate-700">BUYER:</span>
-            <p className="text-slate-900 font-mono">"Increase to 600 units."</p>
-          </div>
-
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-0.5">
-            <span className="font-bold text-slate-700">SELLER AGENT:</span>
-            <p className="text-slate-900 font-mono">"₹695.45 per unit."</p>
-          </div>
-
-          <div className="p-3 bg-purple-50 rounded-lg border border-purple-200 space-y-1 text-purple-900">
-            <span className="font-bold text-purple-800">DECISION ENGINE:</span>
-            <div className="space-y-0.5 font-medium">
-              <p>✓ Within buyer authority.</p>
-              <p>✓ Seller margin protected.</p>
-              <p>✓ Delivery requirement satisfied.</p>
-            </div>
-          </div>
-
-          <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-1 text-emerald-900">
-            <span className="font-bold uppercase text-[10px] text-emerald-800">FINAL AGREEMENT</span>
-            <p className="font-bold text-slate-900 text-sm">600 units | ₹695.45 / unit | ₹4,17,270 total | 5-day delivery</p>
-          </div>
-
-          <div className="pt-2 text-center">
-            <button
-              onClick={() => {
-                onSelectScenario('scenario-01');
-                onSelectRole('buyer');
-              }}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-lg transition-all"
-            >
-              Approve agreement
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================== */}
-      {/* 9. THE DIFFERENTIATOR */}
+      {/* 5. AI VS DECISION ENGINE */}
       {/* ================================================== */}
       <section className="space-y-8 pt-6 border-t border-slate-200">
         <div className="space-y-2">
@@ -249,34 +241,30 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-3">
             <span className="font-bold text-blue-600 uppercase tracking-wider">WHAT AI DOES</span>
             <ul className="space-y-2 text-slate-700 font-medium">
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Understands buyer & seller requests</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Communicates structured offers</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Understands natural language buyer requests</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Communicates structured offers to suppliers</li>
               <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Negotiates volume & SLA concessions</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Explains commercial outcomes</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 shrink-0" /> Explains commercial outcomes in plain language</li>
             </ul>
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-3">
             <span className="font-bold text-purple-600 uppercase tracking-wider">WHAT THE DECISION ENGINE CONTROLS</span>
             <ul className="space-y-2 text-slate-700 font-medium">
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Authorized Buyer Budget</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Authorized Buyer Budget Limit</li>
               <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Minimum Seller Profit Margin Floor</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Quantity Tiers & Inventory</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Quantity Tiers & Stock Constraints</li>
               <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Delivery SLA & Payment Terms</li>
-              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Governance & Authority Limits</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Governance & Approval Gates</li>
             </ul>
           </div>
-        </div>
-
-        <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl text-xs text-slate-800 font-semibold text-center">
-          That separation is what makes autonomous negotiation commercially safe.
         </div>
       </section>
 
       {/* ================================================== */}
-      {/* 10. HOW IT WORKS (4 STEPS) */}
+      {/* 6. HOW IT WORKS (FOUR STEPS) */}
       {/* ================================================== */}
-      <section className="space-y-8 pt-6 border-t border-slate-200">
+      <section id="how-it-works" className="space-y-8 pt-6 border-t border-slate-200">
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
             How it works.
@@ -308,21 +296,17 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             <p className="text-slate-600 leading-relaxed">A human approves the agreement before execution.</p>
           </div>
         </div>
-
-        <p className="text-xs text-slate-500 font-medium text-center">
-          Approved agreements can be executed through Razorpay.
-        </p>
       </section>
 
       {/* ================================================== */}
-      {/* 12. TRY THE DEAL ENGINE */}
+      {/* 7. TRY DEALFLOW (THREE ROLE ENTRY POINTS) */}
       {/* ================================================== */}
       <section id="try-section" className="space-y-8 pt-6 border-t border-slate-200">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-            Try the Deal Engine
+            Try DealFlow
           </h2>
-          <p className="text-xs text-slate-600">Choose how you want to see the same negotiation.</p>
+          <p className="text-xs text-slate-600">Select your perspective to see the negotiation in action.</p>
         </div>
 
         {/* THREE CHOICES ONLY */}
@@ -332,9 +316,9 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
           <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
             <div className="space-y-2">
               <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">BUYER</span>
-              <h3 className="text-base font-bold text-slate-900">Find the best commercial deal.</h3>
+              <h3 className="text-base font-bold text-slate-900">Find the best deal.</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Submit a sourcing request and evaluate Pareto candidate offers.
+                Submit a sourcing request and select from Pareto candidate offers.
               </p>
             </div>
             <button
@@ -349,9 +333,9 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
           <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
             <div className="space-y-2">
               <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">SELLER</span>
-              <h3 className="text-base font-bold text-slate-900">Protect your margin while winning demand.</h3>
+              <h3 className="text-base font-bold text-slate-900">Protect your margin.</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Track incoming demand and evaluate concession trade-offs.
+                Review incoming buyer requests and send automated or custom counters.
               </p>
             </div>
             <button
@@ -362,13 +346,13 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </button>
           </div>
 
-          {/* MARKETPLACE */}
+          {/* ADMIN */}
           <div className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between space-y-4">
             <div className="space-y-2">
-              <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">MARKETPLACE</span>
-              <h3 className="text-base font-bold text-slate-900">See how negotiated commerce performs.</h3>
+              <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">ADMIN</span>
+              <h3 className="text-base font-bold text-slate-900">Understand marketplace performance.</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                View network GMV, buyer savings, agreement rates, and audit logs.
+                View network GMV, buyer savings, agreement rates, and decision audit logs.
               </p>
             </div>
             <button
@@ -384,8 +368,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
         {/* DEMO SCENARIO SELECTOR */}
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div>
-            <span className="font-bold text-slate-900">Demo Scenario</span>
-            <p className="text-slate-500 text-[11px]">Select any of the 10 canonical scenarios to demonstrate specific engine behaviors.</p>
+            <span className="font-bold text-slate-900">Demo Scenario Gallery</span>
+            <p className="text-slate-500 text-[11px]">Select any of the 10 canonical scenarios to evaluate specific engine rules.</p>
           </div>
 
           <select
@@ -407,6 +391,23 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
         </div>
 
       </section>
+
+      {/* ================================================== */}
+      {/* 8. RAZORPAY EXECUTION */}
+      {/* ================================================== */}
+      <section className="bg-slate-900 text-slate-100 rounded-2xl p-6 text-center space-y-2">
+        <h3 className="text-base font-bold">Razorpay Execution Integration</h3>
+        <p className="text-xs text-slate-400 max-w-xl mx-auto">
+          Once a human approves the final negotiated agreement, DealFlow creates a Razorpay payment order for instant digital contract settlement.
+        </p>
+      </section>
+
+      {/* ================================================== */}
+      {/* 9. FOOTER */}
+      {/* ================================================== */}
+      <footer className="text-center text-xs text-slate-400 pt-4 border-t border-slate-200">
+        A2A DealFlow &bull; AI Agents Negotiate. Businesses Stay in Control.
+      </footer>
 
     </div>
   );
