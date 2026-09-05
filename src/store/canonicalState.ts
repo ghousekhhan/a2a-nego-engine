@@ -64,13 +64,63 @@ export interface CanonicalState {
   setPaymentDetails: (payId: string, ordId: string) => void;
 }
 
+function parseRouteFromUrl(): { role: UserRole; tab: ViewTab } {
+  if (typeof window === 'undefined') return { role: 'landing', tab: 'control_room' };
+  const path = window.location.pathname.toLowerCase();
+  if (path.includes('/buyer')) {
+    if (path.includes('/contract')) return { role: 'buyer', tab: 'contract' };
+    if (path.includes('/payment')) return { role: 'buyer', tab: 'payment' };
+    if (path.includes('/what_if')) return { role: 'buyer', tab: 'what_if' };
+    if (path.includes('/audit')) return { role: 'buyer', tab: 'audit' };
+    return { role: 'buyer', tab: 'control_room' };
+  }
+  if (path.includes('/seller')) {
+    if (path.includes('/contract')) return { role: 'seller', tab: 'contract' };
+    if (path.includes('/payment')) return { role: 'seller', tab: 'payment' };
+    if (path.includes('/what_if')) return { role: 'seller', tab: 'what_if' };
+    if (path.includes('/audit')) return { role: 'seller', tab: 'audit' };
+    return { role: 'seller', tab: 'control_room' };
+  }
+  if (path.includes('/admin')) return { role: 'admin', tab: 'control_room' };
+  return { role: 'landing', tab: 'control_room' };
+}
+
 export function useCanonicalState(): CanonicalState {
-  const [role, setRoleState] = useState<UserRole>('landing');
-  const [activeTab, setActiveTab] = useState<ViewTab>('control_room');
+  const initialRoute = parseRouteFromUrl();
+  const [role, setRoleState] = useState<UserRole>(initialRoute.role);
+  const [activeTab, setActiveTabState] = useState<ViewTab>(initialRoute.tab);
+
+  const setActiveTab = useCallback((newTab: ViewTab) => {
+    setActiveTabState(newTab);
+    if (typeof window !== 'undefined') {
+      const currentRole = role === 'landing' ? 'buyer' : role;
+      const targetPath = newTab === 'control_room' ? `/${currentRole}` : `/${currentRole}/${newTab}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ role: currentRole, tab: newTab }, '', targetPath);
+      }
+    }
+  }, [role]);
 
   const setRole = useCallback((newRole: UserRole) => {
     setRoleState(newRole);
-    setActiveTab('control_room');
+    setActiveTabState('control_room');
+    if (typeof window !== 'undefined') {
+      const targetPath = newRole === 'landing' ? '/' : `/${newRole}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ role: newRole, tab: 'control_room' }, '', targetPath);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handlePopState = () => {
+      const { role: r, tab: t } = parseRouteFromUrl();
+      setRoleState(r);
+      setActiveTabState(t);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
   const [activeScenario, setActiveScenario] = useState<CanonicalScenario>(CANONICAL_SCENARIOS[0]);
   const [round, setRound] = useState<number>(1);

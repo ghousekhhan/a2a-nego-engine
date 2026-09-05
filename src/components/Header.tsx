@@ -71,7 +71,7 @@ export function Header({
             </div>
           </button>
 
-          {/* Clean Core Navigation: Negotiate · Search · Deals · Activity · Admin */}
+          {/* Clean Core Navigation: Buyer · Seller · Admin */}
           <nav className="flex items-center gap-1 text-xs font-medium">
             <button
               onClick={() => {
@@ -79,21 +79,12 @@ export function Header({
                 setActiveTab('control_room');
               }}
               className={`px-3 py-1.5 rounded-md transition-colors ${
-                role === 'buyer' && activeTab === 'control_room'
+                role === 'buyer'
                   ? 'bg-zinc-100 text-zinc-900 font-semibold'
                   : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
               }`}
             >
-              Negotiate
-            </button>
-            <button
-              onClick={() => {
-                setRole('buyer');
-                setActiveTab('control_room');
-              }}
-              className="px-3 py-1.5 rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
-            >
-              Search
+              Buyer
             </button>
             <button
               onClick={() => {
@@ -106,20 +97,7 @@ export function Header({
                   : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
               }`}
             >
-              Deals
-            </button>
-            <button
-              onClick={() => {
-                setRole('buyer');
-                setActiveTab('audit');
-              }}
-              className={`px-3 py-1.5 rounded-md transition-colors ${
-                role === 'buyer' && activeTab === 'audit'
-                  ? 'bg-zinc-100 text-zinc-900 font-semibold'
-                  : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
-              }`}
-            >
-              Activity
+              Seller
             </button>
             <button
               onClick={() => {

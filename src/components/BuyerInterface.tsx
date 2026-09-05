@@ -191,10 +191,11 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
     setIsSearching(false);
 
     // Initial Search confirmation turn
+    const sessionNonce = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const supplier = searchRes.recommendedSupplier;
     const initialTurns: DialogueTurn[] = [
       {
-        id: 'turn-intent',
+        id: `turn-intent-${sessionNonce}`,
         sender: 'user',
         senderTitle: 'PURCHASE INTENT',
         subtitle: intent.destination,
@@ -202,7 +203,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
       {
-        id: 'turn-buyer-search',
+        id: `turn-buyer-search-${sessionNonce}`,
         sender: 'buyer',
         senderTitle: 'BUYER AGENT',
         subtitle: 'Representing Acme Manufacturing',
@@ -246,7 +247,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
     });
 
     const turn1: DialogueTurn = {
-      id: 'turn-seller-1',
+      id: `turn-seller-1-${sessionNonce}`,
       sender: 'seller',
       senderTitle: 'SELLER AGENT',
       subtitle: supplier.supplierName,
@@ -277,7 +278,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
     });
 
     const turn2: DialogueTurn = {
-      id: 'turn-buyer-2',
+      id: `turn-buyer-2-${sessionNonce}`,
       sender: 'buyer',
       senderTitle: 'BUYER AGENT',
       subtitle: 'Commercial Concession Probe',
@@ -311,7 +312,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
     });
 
     const turn3: DialogueTurn = {
-      id: 'turn-seller-2',
+      id: `turn-seller-2-${sessionNonce}`,
       sender: 'seller',
       senderTitle: 'SELLER AGENT',
       subtitle: 'Dynamic Margin Counter',
@@ -326,7 +327,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
     await new Promise((r) => setTimeout(r, 500));
 
     const systemTurn: DialogueTurn = {
-      id: 'turn-system-check',
+      id: `turn-system-check-${sessionNonce}`,
       sender: 'system',
       senderTitle: 'DEALFLOW &middot; DETERMINISTIC POLICY VERIFICATION',
       subtitle: 'Feasibility Confirmed',
@@ -491,6 +492,50 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
               <span className="block">{searchResult.stats.suppliersMeetingAllRequirements}</span>
               <span>All Criteria Passed</span>
             </div>
+          </div>
+
+          {/* Identified Suppliers Table */}
+          <div className="overflow-x-auto border border-zinc-200 rounded-lg bg-white mt-2">
+            <table className="w-full text-left text-xs font-mono">
+              <thead>
+                <tr className="border-b border-zinc-200 text-[10px] text-zinc-500 uppercase tracking-wider bg-zinc-50">
+                  <th className="py-2 px-3 font-semibold">Supplier / Catalog Product</th>
+                  <th className="py-2 px-3 font-semibold">Stock</th>
+                  <th className="py-2 px-3 font-semibold">Delivery SLA</th>
+                  <th className="py-2 px-3 font-semibold">Reliability</th>
+                  <th className="py-2 px-3 font-semibold">Catalog Price</th>
+                  <th className="py-2 px-3 font-semibold text-right">Negotiation Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 text-zinc-800">
+                {searchResult.products.slice(0, 3).map((prod) => {
+                  const isSelected = prod.supplierId === searchResult.recommendedSupplier.supplierId;
+                  return (
+                    <tr key={prod.id} className={isSelected ? 'bg-zinc-50/80 font-medium' : 'hover:bg-zinc-50/40'}>
+                      <td className="py-2 px-3 font-sans">
+                        <div className="font-semibold text-zinc-900">{prod.supplierName}</div>
+                        <div className="text-[11px] text-zinc-500">{prod.name}</div>
+                      </td>
+                      <td className="py-2 px-3">{formatNumber(prod.availableQuantity)} units</td>
+                      <td className="py-2 px-3">{prod.deliveryDaysCapability} days</td>
+                      <td className="py-2 px-3">{(prod.supplierReliability * 100).toFixed(1)}%</td>
+                      <td className="py-2 px-3 font-semibold">{formatMoney(prod.unitPrice, true)}</td>
+                      <td className="py-2 px-3 text-right">
+                        {isSelected ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] bg-zinc-900 text-white px-2 py-0.5 rounded font-mono font-medium">
+                            <Check className="w-2.5 h-2.5" /> Selected &middot; Negotiating
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-zinc-400 font-mono">
+                            Standby Candidate
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </section>
       )}

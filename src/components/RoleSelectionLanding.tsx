@@ -22,14 +22,14 @@ interface RoleSelectionLandingProps {
 }
 
 export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSelectionLandingProps) {
-  // Auto-playing negotiation step state (0 to 5)
-  const [activeStep, setActiveStep] = useState<number>(5);
+  // Auto-playing negotiation step state (0 to 6)
+  const [activeStep, setActiveStep] = useState<number>(6);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
-      setActiveStep((prev) => (prev >= 5 ? 0 : prev + 1));
+      setActiveStep((prev) => (prev >= 6 ? 0 : prev + 1));
     }, 2500);
     return () => clearInterval(interval);
   }, [isPlaying]);
@@ -88,8 +88,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
       {/* 01 — HERO */}
       {/* ================================================== */}
       <section className="space-y-6 pt-4 text-left max-w-2xl">
-        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-          A2A DealFlow
+        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">
+          A2A DEALFLOW
         </p>
 
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-zinc-950 leading-[1.12]">
@@ -98,33 +98,35 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
         </h1>
 
         <p className="text-base text-zinc-600 leading-relaxed font-normal">
-          DealFlow lets businesses find suppliers, negotiate commercial terms through AI agents, and approve the final deal.
+          DealFlow lets businesses find suppliers, negotiate commercial terms through AI agents, and approve the deal before payment.
         </p>
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
           <button
             onClick={() => onSelectRole('buyer')}
-            className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm px-6 py-3 rounded-lg transition-all flex items-center gap-2 shadow-xs"
+            className="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm px-6 py-3 rounded-lg transition-all flex items-center gap-2 shadow-xs cursor-pointer"
           >
-            Start negotiating <ArrowRight className="w-4 h-4" />
+            Start a negotiation <ArrowRight className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => onSelectRole('seller')}
-            className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-sm px-5 py-3 rounded-lg transition-all flex items-center gap-2"
+          <a
+            href="#demo"
+            className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-sm px-5 py-3 rounded-lg transition-all flex items-center gap-2 cursor-pointer"
           >
-            Negotiate as Seller
-          </button>
+            See how it works
+          </a>
         </div>
 
-        {/* Search → Negotiate → Approve → Pay */}
-        <div className="pt-3 flex items-center gap-2.5 text-xs text-zinc-500 font-medium">
-          <span className="text-zinc-900 font-semibold">Search</span>
+        {/* 5-Stage Connected Path: Discover → Search → Negotiate → Decide → Execute */}
+        <div className="pt-4 flex flex-wrap items-center gap-2 text-xs text-zinc-500 font-medium">
+          <span className="text-zinc-900 font-semibold font-mono">01 DISCOVER</span>
           <span className="text-zinc-300">→</span>
-          <span className="text-zinc-900 font-semibold">Negotiate</span>
+          <span className="text-zinc-900 font-semibold font-mono">02 SEARCH</span>
           <span className="text-zinc-300">→</span>
-          <span className="text-zinc-900 font-semibold">Approve</span>
+          <span className="text-zinc-900 font-semibold font-mono">03 NEGOTIATE</span>
           <span className="text-zinc-300">→</span>
-          <span className="text-zinc-900 font-semibold">Pay</span>
+          <span className="text-zinc-900 font-semibold font-mono">04 DECIDE</span>
+          <span className="text-zinc-300">→</span>
+          <span className="text-zinc-900 font-semibold font-mono">05 EXECUTE</span>
         </div>
       </section>
 
@@ -145,7 +147,7 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-500">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span>{activeStep === 5 ? 'Agreement Reached' : `Turn ${Math.min(activeStep + 1, 4)} / 4`}</span>
+              <span>{activeStep === 6 ? 'Agreement Reached' : activeStep === 1 ? 'Supplier Discovery' : activeStep === 0 ? 'Requesting...' : `Turn ${activeStep - 1} / 4`}</span>
             </div>
 
             <div className="flex items-center gap-1 pl-2 border-l border-zinc-200">
@@ -180,8 +182,25 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </div>
           </div>
 
-          {/* TURN 1: Buyer Agent Probes Baseline */}
+          {/* STEP 1: Supplier Discovery & Catalog Match */}
           {activeStep >= 1 && (
+            <div className="max-w-md">
+              <div className="text-[11px] font-mono text-zinc-500 mb-1">
+                MARKETPLACE SEARCH &middot; BUYER AGENT DISCOVERY
+              </div>
+              <div className="text-xs text-zinc-800 pl-3 border-l-2 border-zinc-400 py-1.5 bg-zinc-50/70 space-y-1">
+                <p className="font-medium text-zinc-900">
+                  Scanned marketplace &middot; 3 candidate suppliers identified.
+                </p>
+                <p className="text-zinc-600">
+                  Selected <span className="font-semibold text-zinc-900">Apex Industrial Components</span> (Pune) &middot; 1,200 units in stock &middot; 96.0% SLA rating &middot; 5-day delivery capability. Opening negotiation.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TURN 1 (Step 2): Buyer Agent Probes Baseline */}
+          {activeStep >= 2 && (
             <div className="max-w-md">
               <div className="text-[11px] font-mono text-zinc-500 mb-1">
                 BUYER AGENT &middot; Representing Acme Manufacturing
@@ -192,8 +211,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </div>
           )}
 
-          {/* TURN 2: Seller Agent Responds */}
-          {activeStep >= 2 && (
+          {/* TURN 2 (Step 3): Seller Agent Responds */}
+          {activeStep >= 3 && (
             <div className="max-w-md ml-auto text-right">
               <div className="text-[11px] font-mono text-zinc-500 mb-1">
                 SELLER AGENT &middot; Representing Apex Industrial
@@ -204,8 +223,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </div>
           )}
 
-          {/* TURN 3: Buyer Agent Concession Trade-off */}
-          {activeStep >= 3 && (
+          {/* TURN 3 (Step 4): Buyer Agent Concession Trade-off */}
+          {activeStep >= 4 && (
             <div className="max-w-md">
               <div className="text-[11px] font-mono text-zinc-500 mb-1">
                 BUYER AGENT &middot; Concession Proposal
@@ -216,8 +235,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </div>
           )}
 
-          {/* TURN 4: Seller Counter with Margin Protection */}
-          {activeStep >= 4 && (
+          {/* TURN 4 (Step 5): Seller Counter with Margin Protection */}
+          {activeStep >= 5 && (
             <div className="max-w-md ml-auto text-right">
               <div className="text-[11px] font-mono text-zinc-500 mb-1">
                 SELLER AGENT &middot; Economic Counter
@@ -228,8 +247,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </div>
           )}
 
-          {/* DEALFLOW POLICY CHECK: Centered */}
-          {activeStep >= 5 && (
+          {/* DEALFLOW POLICY CHECK (Step 6): Centered */}
+          {activeStep >= 6 && (
             <div className="py-3 border-y border-zinc-200/80 my-4">
               <div className="max-w-md mx-auto text-center space-y-1.5">
                 <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
@@ -248,8 +267,8 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
             </div>
           )}
 
-          {/* DEAL FOUND: Commercial Outcome */}
-          {activeStep >= 5 && (
+          {/* DEAL FOUND (Step 6): Commercial Outcome */}
+          {activeStep >= 6 && (
             <div className="pt-2 pl-3 border-l-2 border-emerald-600 space-y-2">
               <div className="text-xs font-mono text-emerald-800 uppercase tracking-wider">
                 Deal Found &middot; Ready for Human Approval
@@ -344,22 +363,81 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
 
         </div>
 
-        {/* Private Economics Detail */}
-        <div className="pt-6 border-t border-zinc-100 grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
-          <div>
-            <span className="font-mono text-zinc-400 text-[11px] block">01 &middot; BUYER ECONOMICS</span>
-            <p className="font-medium text-zinc-900 mt-1">Authorized budget & deadlines</p>
-            <p className="text-zinc-500 mt-0.5">Kept confidential. The seller only sees whether a proposal meets policy, never the buyer’s max ceiling.</p>
+        {/* Private Economics Visual Architecture */}
+        <div className="pt-6 border-t border-zinc-200/80 space-y-4">
+          <div className="text-center max-w-md mx-auto space-y-1">
+            <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+              Private Reservation Boundaries
+            </span>
+            <p className="text-xs text-zinc-700 font-medium">
+              They negotiate without exposing their private economics.
+            </p>
           </div>
-          <div>
-            <span className="font-mono text-zinc-400 text-[11px] block">02 &middot; SELLER ECONOMICS</span>
-            <p className="font-medium text-zinc-900 mt-1">Unit costs & 10% margin floor</p>
-            <p className="text-zinc-500 mt-0.5">Kept confidential. The buyer only sees structured offers and counters, never the supplier’s true margin.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs max-w-2xl mx-auto">
+            {/* Buyer Agent Private Domain */}
+            <div className="p-4 rounded-lg bg-zinc-50 border border-zinc-200/80 space-y-2.5">
+              <div className="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 font-mono text-[11px]">
+                <span className="font-semibold text-zinc-900">BUYER AGENT</span>
+                <span className="text-zinc-500">Knows Privately</span>
+              </div>
+              <ul className="space-y-1.5 text-zinc-700 text-[11px]">
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Budget ceiling & target price</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Required quantity & volume flex</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Delivery SLA & site deadlines</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Commercial preferences & weights</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Financial delegation authority limit</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Seller Agent Private Domain */}
+            <div className="p-4 rounded-lg bg-zinc-50 border border-zinc-200/80 space-y-2.5">
+              <div className="flex items-center justify-between pb-1.5 border-b border-zinc-200/60 font-mono text-[11px]">
+                <span className="font-semibold text-zinc-900">SELLER AGENT</span>
+                <span className="text-zinc-500">Knows Privately</span>
+              </div>
+              <ul className="space-y-1.5 text-zinc-700 text-[11px]">
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Inventory depth & warehouse stock</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Unit cost & operating cost structure</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Production line capacity & expedite cost</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>Acceptable payment credit terms</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-zinc-400"></span>
+                  <span>10.0% Minimum margin floor (hard stop)</span>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <span className="font-mono text-zinc-400 text-[11px] block">03 &middot; OVERLAPPING ZOPA</span>
-            <p className="font-medium text-zinc-900 mt-1">Deterministic matching</p>
-            <p className="text-zinc-500 mt-0.5">DealFlow’s engine identifies mutually acceptable terms mathematically without leaking either party's reservation prices.</p>
+
+          <div className="text-center text-[11px] text-zinc-500 font-mono pt-1">
+            Neither party exposes reservation values. DealFlow verifies agreement mathematically.
           </div>
         </div>
       </section>
