@@ -18,6 +18,9 @@ export interface ParsedBuyerIntent {
   priority: 'price' | 'delivery' | 'reliability' | 'volume' | 'balanced';
   paymentPreference: 'upfront' | '30_days' | '15_days';
   summaryConfirmation: string;
+  isInfeasible?: boolean;
+  infeasibilityReason?: string;
+  infeasibilityRemedies?: string[];
 }
 
 export interface BuyerTurnContext {
@@ -167,6 +170,27 @@ class AIService {
 
     const targetBudget = Math.round(maxBudget * 0.92);
 
+    // 8. Commercial Feasibility Check (Scenario 31 / Extreme impossible bounds)
+    let isInfeasible = false;
+    let infeasibilityReason: string | undefined;
+    let infeasibilityRemedies: string[] | undefined;
+
+    const unitBudget = maxBudget / Math.max(1, quantity);
+    const isExtremeLeadTime = quantity >= 3000 && deadlineDays <= 2;
+    const isUnderCostBasis = unitBudget < 100 && !text.includes('bolt') && !text.includes('fastener') && !text.includes('sensor');
+    const isExtremeImbalance = quantity >= 5000 && maxBudget <= 100000;
+
+    if (isExtremeLeadTime || isUnderCostBasis || isExtremeImbalance) {
+      isInfeasible = true;
+      infeasibilityReason = `The requested quantity (${formatNumber(quantity)} units) with ${deadlineDays}-day delivery and budget of ${formatMoney(maxBudget)} (${formatMoney(Math.round(unitBudget))}/unit) violates physical factory capacity and baseline manufacturing cost floors.`;
+      infeasibilityRemedies = [
+        'Increase authorized budget ceiling to align with catalog base pricing',
+        'Extend delivery timeline to standard 6-8 business days',
+        'Reduce order volume to 500 units for immediate inventory allocation',
+        'Request split fulfillment across multiple standby suppliers',
+      ];
+    }
+
     const summaryConfirmation = `${formatNumber(quantity)} ${productQuery} · Destination: ${destination} · ≤ ${deadlineDays} days · Budget ≤ ${formatMoney(maxBudget)}`;
 
     return {
@@ -180,6 +204,9 @@ class AIService {
       priority,
       paymentPreference,
       summaryConfirmation,
+      isInfeasible,
+      infeasibilityReason,
+      infeasibilityRemedies,
     };
   }
 

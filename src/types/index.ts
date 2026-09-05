@@ -286,3 +286,67 @@ export interface WhatIfResult {
   tradeoffExplanation: string;
   requiresHumanApproval: boolean;
 }
+
+// ==================================================
+// A2A MESSAGE CONTRACT & EVENT PROTOCOL (Section 3)
+// ==================================================
+export interface A2ABuyerPrivateState {
+  productRequirement: string;
+  quantity: number;
+  maxBudgetHidden: boolean;
+  deliveryDaysRequired: number;
+  urgency: string;
+  authorizedBudget?: number; // Only accessible by Buyer Agent internally
+}
+
+export interface A2ASellerPrivateState {
+  stockAvailable: number;
+  marginFloorProtected: boolean;
+  deliveryCapability: number;
+  cogsHidden: boolean;
+  unitCostBasis?: number; // Only accessible by Seller Agent internally
+  minMarginFloorPct?: number; // Only accessible by Seller Agent internally
+}
+
+export interface A2ADecisionEngineVerification {
+  budgetStatus: 'PASS' | 'FAIL';
+  marginStatus: 'PASS' | 'FAIL';
+  inventoryStatus: 'PASS' | 'FAIL';
+  slaStatus: 'PASS' | 'FAIL';
+  authorityTier: string;
+  isFeasible: boolean;
+}
+
+export interface A2AMessageContract {
+  id: string;
+  round: number;
+  senderAgent: 'buyer' | 'seller' | 'system' | 'user';
+  receiverAgent: 'buyer' | 'seller' | 'user' | 'all';
+  messageType: 'REQUEST' | 'OFFER' | 'COUNTER' | 'ACCEPT' | 'REJECT' | 'CHECK';
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+  unitPrice: number;
+  deliveryDays: number;
+  paymentTerms: string;
+  timestamp: string;
+  humanReadableMessage: string;
+  agentActivity?: string;
+  technicalDetails?: {
+    buyerPrivateState?: A2ABuyerPrivateState;
+    sellerPrivateState?: A2ASellerPrivateState;
+    decisionEngineCheck?: A2ADecisionEngineVerification;
+  };
+  payload?: Record<string, unknown>;
+}
+
+export interface A2AEventRailItem {
+  id: string;
+  timestamp: string;
+  actor: 'BUYER AGENT' | 'SELLER AGENT' | 'DEALFLOW CHECK' | 'HUMAN';
+  action: string;
+  detail: string;
+  type: 'info' | 'offer' | 'counter' | 'verification' | 'deal';
+}
+
