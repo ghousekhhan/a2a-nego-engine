@@ -111,59 +111,143 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
       {/* ================================================== */}
       {/* 2. INTERACTIVE PRODUCT PREVIEW */}
       {/* ================================================== */}
-      <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs max-w-3xl mx-auto space-y-6 text-xs font-sans">
-        <div className="text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3">
-          Interactive Product Preview
+      {/* ================================================== */}
+      {/* 2. HERO PRODUCT DEMO — LIVE AGENT CONVERSATION */}
+      {/* ================================================== */}
+      <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs max-w-3xl mx-auto space-y-5 text-xs font-sans">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            Live Negotiation Preview
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> DEAL FOUND
+          </span>
         </div>
 
-        <div className="space-y-4">
-          {/* USER STATEMENT */}
-          <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-1">
-            <span className="font-bold text-slate-700 text-[11px] uppercase">USER</span>
-            <p className="font-mono text-slate-900 text-sm font-semibold">
+        {/* CONVERSATION FLOW */}
+        <div className="space-y-3">
+          {/* USER */}
+          <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-slate-900 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-white border border-slate-200 rounded">
+                USER INTENT
+              </span>
+            </div>
+            <p className="font-mono text-slate-900 text-xs font-medium pt-0.5">
               "I need 500 industrial bearings within 6 days under ₹390,000."
             </p>
           </div>
 
-          {/* DEALFLOW RESPONSE */}
-          <div className="bg-blue-50/70 border border-blue-200 p-4 rounded-xl space-y-1 text-blue-950">
-            <span className="font-bold text-blue-700 text-[11px] uppercase">DEALFLOW</span>
-            <p className="text-xs font-medium">
-              Got it. I'm checking available suppliers and negotiating the best commercial options.
+          {/* DEALFLOW */}
+          <div className="bg-blue-50/60 border border-blue-200 p-3 rounded-xl space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-blue-800 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-white border border-blue-200 rounded">
+                DEALFLOW
+              </span>
+            </div>
+            <p className="text-slate-800 text-xs">
+              Got it. I'm checking available suppliers and coordinating autonomous negotiation between buyer and seller agents.
             </p>
           </div>
 
-          <div className="pt-2">
-            <span className="font-bold text-slate-900 text-xs block mb-3">I found 4 viable commercial options:</span>
-
-            {/* 4 ACTIONABLE DEAL OPTIONS CARDS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {interactiveOptions.map((opt, idx) => (
-                <div key={idx} className="bg-white border border-slate-200 hover:border-blue-400 rounded-xl p-4 space-y-2 flex flex-col justify-between transition-all">
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-slate-900 text-[11px]">{opt.title}</span>
-                      <span className="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded text-[10px]">{opt.badge}</span>
-                    </div>
-                    <div className="text-xl font-extrabold text-slate-900">{formatMoney(opt.price)}</div>
-                    <p className="text-[11px] text-slate-600">
-                      {formatNumber(opt.qty)} units &bull; {opt.delivery} &bull; <strong className="text-emerald-700">{opt.savings}</strong>
-                    </p>
-                    <p className="text-[10px] text-slate-500 pt-1">{opt.tradeoff}</p>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      onSelectScenario(opt.scenarioId);
-                      onSelectRole('buyer');
-                    }}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] py-2 rounded-lg transition-all mt-2"
-                  >
-                    Get this deal
-                  </button>
-                </div>
-              ))}
+          {/* BUYER AGENT */}
+          <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 p-3 rounded-xl space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-blue-700 text-[10px] uppercase">BUYER AGENT &bull; Representing buyer requirements</span>
+              <span className="text-[10px] text-slate-400">Step 1</span>
             </div>
+            <p className="text-slate-800 text-xs">
+              "Searching for commercially feasible suppliers meeting &le; ₹390,000 budget and 6-day delivery requirement."
+            </p>
+          </div>
+
+          {/* SELLER AGENT */}
+          <div className="bg-slate-50 border-l-4 border-l-emerald-600 border border-slate-200 p-3 rounded-xl space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-emerald-700 text-[10px] uppercase">SELLER AGENT &bull; Representing seller economics</span>
+              <span className="text-[10px] text-slate-400">Step 2</span>
+            </div>
+            <p className="text-slate-800 text-xs">
+              "Supplier Apex can deliver 500 units in 5 days at ₹750/unit (₹375,000 total). Standard Net 30 terms."
+            </p>
+          </div>
+
+          {/* BUYER AGENT CONCESSION PROBE */}
+          <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 p-3 rounded-xl space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-blue-700 text-[10px] uppercase">BUYER AGENT &bull; Commercial concession</span>
+              <span className="text-[10px] text-slate-400">Step 3</span>
+            </div>
+            <p className="text-slate-800 text-xs">
+              "Can you improve unit pricing if the buyer commits to higher order volume?"
+            </p>
+          </div>
+
+          {/* SELLER AGENT COUNTER */}
+          <div className="bg-slate-50 border-l-4 border-l-emerald-600 border border-slate-200 p-3 rounded-xl space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-emerald-700 text-[10px] uppercase">SELLER AGENT &bull; Counter proposal</span>
+              <span className="text-[10px] text-slate-400">Step 4</span>
+            </div>
+            <p className="text-slate-800 text-xs">
+              "At 600 units, I can reduce unit price to ₹695.45/unit while maintaining my 10.0% minimum profit margin."
+            </p>
+          </div>
+
+          {/* DECISION ENGINE POLICY CHECK */}
+          <div className="bg-purple-50/80 border border-purple-200 p-3.5 rounded-xl space-y-1.5 text-[11px] text-purple-950">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-purple-800 uppercase tracking-wider text-[10px]">
+                DECISION ENGINE &bull; Commercial Policy Check
+              </span>
+              <span className="text-emerald-700 font-bold text-[10px]">✓ Commercially Feasible</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-purple-900 font-medium pt-0.5">
+              <span>✓ Budget &le; ₹390,000</span>
+              <span>✓ Seller Margin &ge; 10%</span>
+              <span>✓ Delivery &le; 6 Days</span>
+              <span>✓ Spend &le; Authority</span>
+            </div>
+          </div>
+
+          {/* DEALFLOW SUMMARY */}
+          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl space-y-2 text-emerald-950">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-emerald-900 text-xs uppercase">DEALFLOW &bull; 4 VIABLE STRUCTURES FOUND</span>
+              <span className="text-emerald-800 text-xs font-semibold">Recommended Deal: ₹3,82,500</span>
+            </div>
+            <p className="text-slate-700 text-xs">
+              Autonomous negotiation concluded. Select an actionable deal structure below to review and approve:
+            </p>
+          </div>
+
+          {/* 4 ACTIONABLE DEAL OPTIONS CARDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {interactiveOptions.map((opt, idx) => (
+              <div key={idx} className="bg-white border border-slate-200 hover:border-blue-400 rounded-xl p-4 space-y-2 flex flex-col justify-between transition-all">
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-900 text-[11px]">{opt.title}</span>
+                    <span className="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded text-[10px]">{opt.badge}</span>
+                  </div>
+                  <div className="text-xl font-extrabold text-slate-900">{formatMoney(opt.price)}</div>
+                  <p className="text-[11px] text-slate-600">
+                    {formatNumber(opt.qty)} units &bull; {opt.delivery} &bull; <strong className="text-emerald-700">{opt.savings}</strong>
+                  </p>
+                  <p className="text-[10px] text-slate-500 pt-1">{opt.tradeoff}</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    onSelectScenario(opt.scenarioId);
+                    onSelectRole('buyer');
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] py-2 rounded-lg transition-all mt-2"
+                >
+                  Get this deal
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -257,6 +341,27 @@ export function RoleSelectionLanding({ onSelectRole, onSelectScenario }: RoleSel
               <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Delivery SLA & Payment Terms</li>
               <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-600 shrink-0" /> Governance & Approval Gates</li>
             </ul>
+          </div>
+        </div>
+
+        {/* SAFETY & CONTROL ARCHITECTURE FLOW */}
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 max-w-xl mx-auto space-y-3 text-center text-xs">
+          <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">THE SAFETY & CONTROL ARCHITECTURE</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 font-semibold text-slate-800">
+            <div className="bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-2xs">
+              <span className="text-blue-700 font-bold block text-[10px] uppercase">BUYER AGENT</span>
+              "Let's negotiate."
+            </div>
+            <span className="text-slate-400 font-bold">&rarr;</span>
+            <div className="bg-white border border-purple-200 px-3 py-2 rounded-lg shadow-2xs">
+              <span className="text-purple-700 font-bold block text-[10px] uppercase">DECISION ENGINE</span>
+              "Is this allowed?"
+            </div>
+            <span className="text-slate-400 font-bold">&rarr;</span>
+            <div className="bg-white border border-emerald-200 px-3 py-2 rounded-lg shadow-2xs">
+              <span className="text-emerald-700 font-bold block text-[10px] uppercase">HUMAN</span>
+              "Approve / Modify / Reject"
+            </div>
           </div>
         </div>
       </section>

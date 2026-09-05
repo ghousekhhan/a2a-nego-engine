@@ -190,22 +190,119 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
         </form>
       </div>
 
-      {/* 2. CONVERSATIONAL ASSISTANT RESPONSE */}
-      <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-5 shadow-xs flex items-start gap-3 text-xs text-blue-950">
-        <Sparkles className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <div className="space-y-1">
-          <span className="font-bold text-blue-900 uppercase tracking-wider text-[11px]">DEALFLOW ASSISTANT</span>
-          <p className="font-medium text-sm text-slate-900">
-            Got it. I found 4 viable commercial options negotiated directly with suppliers.
+      {/* 2. CONVERSATIONAL STREAM & LIVE NEGOTIATION */}
+      <div className="space-y-4">
+        {/* USER INTENT BUBBLE */}
+        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-900 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-white border border-slate-200 rounded">
+              USER INTENT
+            </span>
+          </div>
+          <p className="font-mono text-slate-900 text-sm font-semibold pt-0.5">
+            "{nlInput}"
           </p>
-          <p className="text-slate-600">Select an option below to inspect the terms and evidence before authorizing.</p>
+        </div>
+
+        {/* DEALFLOW COORDINATION BUBBLE */}
+        <div className="bg-blue-50/70 border border-blue-200 p-4 rounded-xl space-y-1 text-xs text-blue-950">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-blue-800 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-white border border-blue-200 rounded">
+              DEALFLOW ASSISTANT
+            </span>
+          </div>
+          <p className="font-medium text-slate-900">
+            Got it. I'm checking available suppliers and coordinating live negotiation between buyer and seller agents.
+          </p>
+        </div>
+
+        {/* LIVE NEGOTIATION STREAM */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4 text-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-blue-600" />
+              <span className="font-bold text-slate-900 text-xs tracking-tight">LIVE NEGOTIATION</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                DEAL FOUND
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {/* BUYER AGENT */}
+            <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 p-3 rounded-xl space-y-0.5">
+              <div className="flex justify-between items-center text-[10px] font-bold">
+                <span className="text-blue-700 uppercase">BUYER AGENT &bull; Representing buyer requirements</span>
+              </div>
+              <p className="text-slate-800 text-xs">
+                "Searching for commercially feasible suppliers meeting budget &le; {formatMoney(buyerPolicy.maxTotalBudget)} and {buyerPolicy.requiredDeliveryDays}-day delivery requirement."
+              </p>
+            </div>
+
+            {/* SELLER AGENT */}
+            <div className="bg-slate-50 border-l-4 border-l-emerald-600 border border-slate-200 p-3 rounded-xl space-y-0.5">
+              <div className="flex justify-between items-center text-[10px] font-bold">
+                <span className="text-emerald-700 uppercase">SELLER AGENT &bull; Representing seller economics</span>
+              </div>
+              <p className="text-slate-800 text-xs">
+                "Supplier Apex can offer {formatNumber(baseQty)} units at ₹750/unit with {buyerPolicy.requiredDeliveryDays}-day delivery SLA."
+              </p>
+            </div>
+
+            {/* BUYER AGENT CONCESSION */}
+            <div className="bg-slate-50 border-l-4 border-l-blue-600 border border-slate-200 p-3 rounded-xl space-y-0.5">
+              <div className="flex justify-between items-center text-[10px] font-bold">
+                <span className="text-blue-700 uppercase">BUYER AGENT &bull; Commercial concession</span>
+              </div>
+              <p className="text-slate-800 text-xs">
+                "Can we improve the unit price if the buyer increases volume or commits to upfront payment terms?"
+              </p>
+            </div>
+
+            {/* SELLER AGENT COUNTER */}
+            <div className="bg-slate-50 border-l-4 border-l-emerald-600 border border-slate-200 p-3 rounded-xl space-y-0.5">
+              <div className="flex justify-between items-center text-[10px] font-bold">
+                <span className="text-emerald-700 uppercase">SELLER AGENT &bull; Counter offer</span>
+              </div>
+              <p className="text-slate-800 text-xs">
+                "At 600 units, I can reduce unit price to ₹695.45/unit while maintaining my 10.0% minimum profit margin."
+              </p>
+            </div>
+
+            {/* DECISION ENGINE POLICY CHECK */}
+            <div className="bg-purple-50/80 border border-purple-200 p-3.5 rounded-xl space-y-1.5 text-[11px] text-purple-950">
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-purple-800 uppercase tracking-wider text-[10px]">
+                  DECISION ENGINE &bull; Commercial Policy Check
+                </span>
+                <span className="text-emerald-700 font-bold text-[10px]">✓ Commercially Feasible</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-purple-900 font-medium">
+                <span>✓ Budget &le; {formatMoney(buyerPolicy.maxTotalBudget)}</span>
+                <span>✓ Seller Margin &ge; 10%</span>
+                <span>✓ Delivery &le; {buyerPolicy.requiredDeliveryDays} Days</span>
+                <span>✓ Spend &le; Authority</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* DEALFLOW OPTIONS ANNOUNCEMENT */}
+        <div className="bg-blue-50/70 border border-blue-200 p-3.5 rounded-xl text-xs text-blue-950">
+          <p className="font-medium text-sm text-slate-900">
+            DealFlow: "I found 4 ways to structure this deal."
+          </p>
+          <p className="text-slate-600 mt-0.5 text-xs">
+            Select an actionable deal structure below:
+          </p>
         </div>
       </div>
 
       {/* 3. FOUR ACTIONABLE DEAL OPTION CARDS */}
       <div className="space-y-3">
-        <span className="font-bold text-slate-900 text-sm block">Choose from 4 negotiated commercial options:</span>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {dealOptions.map((opt, idx) => {
             const isSelected = selectedOptionIndex === idx;
@@ -231,7 +328,7 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
                 <div>
                   <div className="text-2xl font-extrabold text-slate-900">{formatMoney(opt.price)}</div>
                   <p className="text-xs text-slate-600 mt-0.5 font-medium">
-                    {formatNumber(opt.qty)} units &bull; {opt.deliveryDays} days &bull; <strong className="text-emerald-700">{typeof opt.savings === 'number' ? `${formatMoney(opt.savings)} savings` : opt.savings}</strong>
+                    {formatNumber(opt.qty)} units &bull; {opt.deliveryDays} days &bull; <strong className="text-emerald-700">{typeof opt.savings === 'number' ? `${formatMoney(opt.savings)} saved` : opt.savings}</strong>
                   </p>
                 </div>
 
@@ -257,115 +354,101 @@ export function BuyerInterface({ state }: { state: CanonicalState }) {
         </div>
       </div>
 
-      {/* 4. YOUR DEAL — SELECTED DEAL SPOTLIGHT */}
+      {/* 4. THIS IS THE MAGIC MOMENT — SELECTED DEAL RECOMMENDATION */}
       <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 shadow-xs space-y-6">
+        <div className="border-b border-slate-100 pb-3">
+          <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider block">RECOMMENDED AGREEMENT</span>
+          <p className="text-slate-600 text-xs mt-0.5">DealFlow: "Here's the deal I'd recommend."</p>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
           <div>
-            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">YOUR DEAL</span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-1">{formatMoney(selectedOption.price)}</h1>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">{formatMoney(selectedOption.price)}</h1>
+            <p className="text-xs text-slate-500 mt-1 font-medium">
+              {formatNumber(selectedOption.qty)} units &bull; {selectedOption.deliveryDays}-day delivery &bull; {selectedOption.reliability}
+            </p>
           </div>
 
           <div className="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl text-xs font-bold text-emerald-800">
-            {typeof selectedOption.savings === 'number' ? `SAVINGS: ${formatMoney(selectedOption.savings)}` : selectedOption.savings}
+            {typeof selectedOption.savings === 'number' ? `SAVED: ${formatMoney(selectedOption.savings)}` : selectedOption.savings}
           </div>
         </div>
 
-        {/* IMPORTANT TERMS */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Quantity:</span>
-            <p className="font-bold text-slate-900 text-sm mt-0.5">{formatNumber(selectedOption.qty)} units</p>
-          </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Unit Price:</span>
-            <p className="font-bold text-slate-900 text-sm mt-0.5">{formatMoney(selectedOption.unitPrice, true)}/u</p>
-          </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Delivery SLA:</span>
-            <p className="font-bold text-slate-900 text-sm mt-0.5">{selectedOption.deliveryDays} Calendar Days</p>
-          </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <span className="text-slate-500 font-semibold">Supplier:</span>
-            <p className="font-bold text-slate-900 text-xs mt-0.5">{selectedOption.supplier}</p>
-          </div>
-        </div>
-
-        {/* WHY I RECOMMEND IT */}
+        {/* WHY THIS DEAL */}
         <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl space-y-3 text-xs">
-          <span className="font-bold text-slate-900 uppercase text-[10px] tracking-wider">WHY I RECOMMEND IT</span>
+          <span className="font-bold text-slate-900 uppercase text-[10px] tracking-wider">WHY THIS DEAL</span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 font-medium">
-            {selectedOption.recommendationPoints.map((pt, idx) => (
-              <p key={idx} className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{pt}</span>
-              </p>
-            ))}
+            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Within your authorized budget ({formatMoney(buyerPolicy.maxTotalBudget)})</p>
+            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Delivery requirement satisfied ({selectedOption.deliveryDays} &le; {buyerPolicy.requiredDeliveryDays} days)</p>
+            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Supplier reliability satisfied ({selectedOption.reliability})</p>
+            <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> Seller minimum margin protected (34.6% &ge; 10.0% floor)</p>
           </div>
         </div>
 
-        {/* PRIMARY ACTION */}
+        {/* AUTOMATIC COMMERCIAL INSIGHTS */}
+        <div className="space-y-2 text-xs">
+          <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider">COMMERCIAL INSIGHTS</span>
+          <div className="space-y-1.5 text-slate-700">
+            <div className="bg-blue-50/60 border border-blue-200 p-2.5 rounded-lg">
+              &bull; Increasing quantity to 600 units reduced the unit price to ₹695.45 while preserving seller margin.
+            </div>
+            <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg">
+              &bull; Supplier Meridian offers fastest delivery (3 days) at 98.5% reliability with emergency SLA guarantee.
+            </div>
+            <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg">
+              &bull; Upfront payment terms unlock additional financing discount vs standard Net 30 invoices.
+            </div>
+          </div>
+        </div>
+
+        {/* CONVERSATION OPTIMIZATION CHOICES */}
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
+          <span className="font-bold text-slate-700">What would you like me to optimize?</span>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              onClick={() => setSelectedOptionIndex(1)}
+              className="bg-white hover:bg-slate-100 border border-slate-300 font-semibold px-3 py-1.5 rounded-lg text-slate-800 transition-colors"
+            >
+              Lowest Price
+            </button>
+            <button
+              onClick={() => setSelectedOptionIndex(2)}
+              className="bg-white hover:bg-slate-100 border border-slate-300 font-semibold px-3 py-1.5 rounded-lg text-slate-800 transition-colors"
+            >
+              Fastest Delivery
+            </button>
+            <button
+              onClick={() => setSelectedOptionIndex(3)}
+              className="bg-white hover:bg-slate-100 border border-slate-300 font-semibold px-3 py-1.5 rounded-lg text-slate-800 transition-colors"
+            >
+              Better Unit Economics
+            </button>
+            <button
+              onClick={() => setSelectedOptionIndex(0)}
+              className="bg-white hover:bg-slate-100 border border-slate-300 font-semibold px-3 py-1.5 rounded-lg text-slate-800 transition-colors"
+            >
+              Best Overall
+            </button>
+          </div>
+        </div>
+
+        {/* PRIMARY ACTIONS: REVIEW & APPROVE */}
         <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
           <button
             onClick={approveDeal}
             disabled={humanApproved}
             className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs py-3.5 px-8 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2"
           >
-            Review & approve <ArrowRight className="w-4 h-4" />
+            REVIEW & APPROVE <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
-            onClick={() => setIsModifyOpen(true)}
+            onClick={() => setShowEvidenceCharts(!showEvidenceCharts)}
             className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs py-3.5 px-5 rounded-xl border border-slate-300 transition-all"
           >
-            Modify parameters
+            {showEvidenceCharts ? 'HIDE CHARTS' : 'COMPARE OPTIONS'}
           </button>
         </div>
-      </div>
-
-      {/* 5. NEGOTIATION ACTIVITY (COLLAPSED BY DEFAULT) */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4 text-xs">
-        <div
-          onClick={() => setShowNegotiationActivity(!showNegotiationActivity)}
-          className="flex justify-between items-center cursor-pointer select-none border-b border-slate-100 pb-3"
-        >
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-blue-600" />
-            <h3 className="font-bold text-slate-900 text-sm">Negotiation activity</h3>
-          </div>
-          <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold">
-            <span>{showNegotiationActivity ? 'Hide details' : 'Show details'}</span>
-            {showNegotiationActivity ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </div>
-        </div>
-
-        {showNegotiationActivity && (
-          <div className="space-y-3 pt-1">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-0.5">
-              <span className="font-bold text-slate-700 text-[10px] uppercase">1. BUYER REQUESTED</span>
-              <p className="text-slate-900 font-mono text-xs">{nlInput}</p>
-            </div>
-
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-0.5">
-              <span className="font-bold text-slate-700 text-[10px] uppercase">2. SELLER RESPONDED</span>
-              <p className="text-slate-900 font-mono text-xs">"₹750 base unit price, standard 5-day delivery."</p>
-            </div>
-
-            <div className="bg-blue-50 p-3 rounded-xl border border-blue-200 space-y-0.5 text-blue-900">
-              <span className="font-bold text-blue-700 text-[10px] uppercase">3. BUYER CONCESSION</span>
-              <p className="text-xs font-mono">"Offered upfront payment or higher volume commitment in exchange for price tier reduction."</p>
-            </div>
-
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-0.5">
-              <span className="font-bold text-slate-700 text-[10px] uppercase">4. SELLER COUNTER</span>
-              <p className="text-slate-900 font-mono text-xs">"Accepted {formatMoney(selectedOption.price)} ({formatMoney(selectedOption.unitPrice, true)}/unit)."</p>
-            </div>
-
-            <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 space-y-0.5 text-emerald-900">
-              <span className="font-bold text-emerald-800 text-[10px] uppercase">5. AGREEMENT REACHED</span>
-              <p className="text-xs font-bold">{selectedOption.title} &bull; {formatMoney(selectedOption.price)} total &bull; Status: FEASIBLE & APPROVED</p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 6. DECISION EVIDENCE AS SUPPORTING PROOF (AFTER DEAL SELECTION) */}
