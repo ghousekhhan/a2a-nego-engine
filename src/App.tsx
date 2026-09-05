@@ -5,7 +5,7 @@ import { BuyerInterface } from './components/BuyerInterface.tsx';
 import { SellerInterface } from './components/SellerInterface.tsx';
 import { AdminConsole } from './components/AdminConsole.tsx';
 import { WhatIfSimulator } from './components/WhatIfSimulator.tsx';
-import { AuditTraceView } from './components/AuditTraceView.tsx';
+import { DecisionEvidenceView } from './components/DecisionEvidenceView.tsx';
 import { ContractModal } from './components/ContractModal.tsx';
 import { RazorpayModal } from './components/RazorpayModal.tsx';
 
@@ -97,7 +97,7 @@ export function App() {
                 onBack={() => setActiveTab('contract')}
               />
             )}
-            {activeTab === 'audit' && <AuditTraceView auditTrail={state.auditTrail} />}
+            {activeTab === 'audit' && <DecisionEvidenceView auditTrail={state.auditTrail} />}
           </>
         )}
 
@@ -129,7 +129,7 @@ export function App() {
                 onBack={() => setActiveTab('contract')}
               />
             )}
-            {activeTab === 'audit' && <AuditTraceView auditTrail={state.auditTrail} />}
+            {activeTab === 'audit' && <DecisionEvidenceView auditTrail={state.auditTrail} />}
           </>
         )}
 

@@ -20,7 +20,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-01',
     scenarioNumber: '01',
-    name: 'Standard Commercial Agreement',
+    name: 'Standard Agreement',
     shortDescription: 'Balanced multi-round negotiation achieving optimal price, quantity, and payment terms.',
     detailedGoal: 'Procure 500 SKF 6205 ball bearings under ₹3.6L target budget with 5-day delivery.',
     expectedOutcome: 'Multi-round convergence to ₹382,500 for 550 units with upfront payment financing discount.',
@@ -48,7 +48,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-02',
     scenarioNumber: '02',
-    name: 'Buyer Below Seller Floor (No Deal)',
+    name: 'Buyer Below Seller Floor',
     shortDescription: 'Buyer budget is below seller zero-profit cost floor, generating a formal No-Deal Certificate.',
     detailedGoal: 'Request 500 units at ₹200,000 budget (₹400/unit), well below seller cost (₹450/unit).',
     expectedOutcome: 'Immediate NO_DEAL evaluation with No-Deal Certificate calculating ₹25,000 economic gap.',
@@ -72,7 +72,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-03',
     scenarioNumber: '03',
-    name: 'Quantity Unlocks Volume Discount',
+    name: 'Volume Unlocks Discount',
     shortDescription: 'Buyer increases order quantity from 500 to 600 units to cross seller pricing tier.',
     detailedGoal: 'Demonstrate volume concession trade-off lowering unit price from ₹820 to ₹670.',
     expectedOutcome: 'Engine recommends 600 units at ₹402,000 total price yielding ₹150/unit saving.',
@@ -97,7 +97,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-04',
     scenarioNumber: '04',
-    name: 'Cheap vs Reliable Supplier Trade-Off',
+    name: 'Cheap but Unreliable Supplier',
     shortDescription: 'Evaluates low-cost uncertified supplier (82% reliability) vs premium supplier (98%).',
     detailedGoal: 'Calculate total landed cost including risk premium for delivery failure and defects.',
     expectedOutcome: 'Decision Engine selects Meridian Bearings (98% reliability) as higher net utility despite +8% unit price.',
@@ -120,7 +120,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-05',
     scenarioNumber: '05',
-    name: 'Multi-Supplier Basket vs Single Supplier',
+    name: 'Multi-Supplier Basket',
     shortDescription: 'Splits 1,000 unit demand across primary reliable supplier and secondary backup supplier.',
     detailedGoal: 'De-risk large volume procurement by evaluating multi-sourcing allocation economics.',
     expectedOutcome: 'Engine allocates 700 units to Meridian (Primary) and 300 units to Reliance (Secondary).',
@@ -144,7 +144,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-06',
     scenarioNumber: '06',
-    name: 'Faster Delivery Economic Trade-Off',
+    name: 'Faster Delivery Has Economic Value',
     shortDescription: 'Buyer pays expedite fee of ₹3,500 to compress delivery schedule from 5 days to 2 days.',
     detailedGoal: 'Quantify daily delay cost savings vs express logistics surge cost.',
     expectedOutcome: 'Engine approves 2-day delivery deal because production downtime cost exceeds expedite fee.',
@@ -168,7 +168,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-07',
     scenarioNumber: '07',
-    name: 'Upfront Payment Financing Discount',
+    name: 'Upfront Payment Unlocks Discount',
     shortDescription: 'Buyer switches payment terms from Net 30 to Upfront cash to capture 3% supplier cash discount.',
     detailedGoal: 'Model working capital cost of capital vs cash discount benefit.',
     expectedOutcome: 'Engine confirms upfront cash payment saves ₹12,500 total cost for buyer while boosting seller cashflow utility.',
@@ -192,7 +192,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-08',
     scenarioNumber: '08',
-    name: 'Long-Term Blanket Contract Discount',
+    name: 'Long-Term Contract',
     shortDescription: 'Buyer commits to 12-month annual contract unlocking tier-1 wholesale pricing.',
     detailedGoal: 'Leverage annual volume commitment to secure 14% lower unit price.',
     expectedOutcome: 'Engine generates 12-month agreement term deal at ₹680/unit with scheduled quarterly releases.',
@@ -214,7 +214,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-09',
     scenarioNumber: '09',
-    name: 'Unknown Mandatory Information Prompt',
+    name: 'Unknown Mandatory Information',
     shortDescription: 'Negotiation input is missing required delivery timeline, triggering automated info prompt.',
     detailedGoal: 'Verify agent layer halts execution and prompts user when required fields are missing.',
     expectedOutcome: 'Status: NEEDS_INFORMATION with specific prompt for required delivery timeline.',
@@ -236,7 +236,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
   {
     id: 'scenario-10',
     scenarioNumber: '10',
-    name: 'Authority Boundary & Governance Gate',
+    name: 'Authority / No-Deal Boundary',
     shortDescription: 'Calculated deal exceeds autonomous agent spend limit, halting for human approval.',
     detailedGoal: 'Enforce governance ceiling: automated deals above ₹3.5L require explicit human authorization.',
     expectedOutcome: 'Status: HUMAN_REVIEW / BLOCKED with audit log entry enforcing authority boundary.',

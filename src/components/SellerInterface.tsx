@@ -1,19 +1,18 @@
 import React from 'react';
 import {
   Building2,
-  TrendingUp,
-  ShieldCheck,
-  Zap,
-  Package,
-  Layers,
-  ArrowUpRight,
   CheckCircle2,
   AlertCircle,
-  BarChart3,
-  DollarSign,
+  Zap,
 } from 'lucide-react';
 import type { CanonicalState } from '../store/canonicalState.ts';
-import { MarginDiscountChart } from './charts/Visualizations.tsx';
+import {
+  MarginDiscountChart,
+  InventoryPressureChart,
+  DemandCapacityChart,
+  RevenueContributionChart,
+} from './charts/Visualizations.tsx';
+import { formatMoney, formatPercent, formatNumber } from '../utils/formatters.ts';
 
 export function SellerInterface({ state }: { state: CanonicalState }) {
   const { sellerPolicy, currentDeal, scoredDeal } = state;
@@ -23,180 +22,157 @@ export function SellerInterface({ state }: { state: CanonicalState }) {
   const revenue = currentQty * unitPrice;
   const unitCost = 450;
   const profit = (unitPrice - unitCost) * currentQty;
-  const marginPct = ((profit / revenue) * 100).toFixed(1);
+  const marginPct = (profit / revenue) * 100;
+
+  const activeNegotiations = [
+    {
+      buyer: 'Industrial Procurement Corp Ltd',
+      product: 'SKF 6205-2RS1 Deep Groove Ball Bearing',
+      qty: currentQty,
+      offer: revenue,
+      unitPrice: unitPrice,
+      margin: marginPct,
+      delivery: `${currentDeal.deliveryDays} Days`,
+      stage: `Round ${state.round} / ${state.maxRounds}`,
+      recommendation: `Counter at ${formatMoney(revenue)} — preserves minimum 10% margin while meeting buyer budget.`,
+    },
+    {
+      buyer: 'Reliance Heavy Machinery',
+      product: 'Siemens 15kW AC Induction Motor',
+      qty: 12,
+      offer: 480000,
+      unitPrice: 40000,
+      margin: 24.5,
+      delivery: '7 Days',
+      stage: 'Round 1 Initial RFQ',
+      recommendation: 'Propose volume discount tier for orders over 15 units.',
+    },
+  ];
+
+  const merchantInsights = [
+    "Inventory pressure is high for SKF 6205 bearings (1,200 in stock); accepting a smaller margin (34.6%) is preferable to carrying excess inventory.",
+    "Buyer order volume (550 units) creates +₹135,000 gross contribution, justifying the volume pricing concession.",
+    "Current counteroffer stays safely above the configured seller floor margin (10.0%).",
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-[1140px] mx-auto space-y-6 font-sans antialiased text-slate-900">
       
-      {/* Top Banner */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center font-bold">
-            <Building2 className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Merchant Command Center</span>
-            <h2 className="text-lg font-bold text-slate-900">Apex Industrial Components — Deal Engine Desk</h2>
-          </div>
+      {/* 1. HEADER */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">SUPPLIER COMMERCIAL DESK</span>
+          <h1 className="text-xl font-bold text-slate-900 mt-0.5">Merchant Command Center</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-500">Inventory Status:</span>
-          <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-300">
-            High Stock (1,200 units available)
-          </span>
+        <div className="text-xs text-slate-500 font-semibold bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">
+          Merchant: <strong className="text-slate-900">Apex Industrial Components</strong>
         </div>
       </div>
 
-      {/* Seller KPI Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
-          <span className="text-[11px] font-medium text-slate-500">Gross Deal Revenue</span>
-          <p className="text-xl font-bold text-slate-900 mt-0.5">₹{revenue.toLocaleString()}</p>
-          <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5 mt-0.5">
-            <ArrowUpRight className="w-3 h-3" /> +12.4% vs Base Pricing
-          </span>
+      {/* 2. TOP METRICS STRIP */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+          <span className="text-[10px] font-semibold text-slate-500 uppercase">Revenue Negotiated</span>
+          <p className="text-base font-extrabold text-slate-900 mt-0.5">{formatMoney(revenue)}</p>
+          <span className="text-[10px] text-emerald-600 font-semibold">+12.4% vs Base</span>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
-          <span className="text-[11px] font-medium text-slate-500">Unit Gross Margin %</span>
-          <p className="text-xl font-bold text-emerald-600 mt-0.5">{marginPct}%</p>
-          <span className="text-[10px] text-slate-400">Min Floor: 10.0% | Target: 22.0%</span>
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+          <span className="text-[10px] font-semibold text-slate-500 uppercase">Gross Margin %</span>
+          <p className="text-base font-extrabold text-emerald-600 mt-0.5">{formatPercent(marginPct)}</p>
+          <span className="text-[10px] text-slate-400">Min Floor: 10.0%</span>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
-          <span className="text-[11px] font-medium text-slate-500">Gross Profit Contribution</span>
-          <p className="text-xl font-bold text-slate-900 mt-0.5">₹{profit.toLocaleString()}</p>
-          <span className="text-[10px] text-slate-400">Unit Profit: ₹{unitPrice - unitCost}/u</span>
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+          <span className="text-[10px] font-semibold text-slate-500 uppercase">Active Negotiations</span>
+          <p className="text-base font-extrabold text-blue-600 mt-0.5">2 RFQs</p>
+          <span className="text-[10px] text-slate-400">1 Action Needed</span>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
-          <span className="text-[11px] font-medium text-slate-500">Inventory Clearance</span>
-          <p className="text-xl font-bold text-blue-600 mt-0.5">
-            {((currentQty / 1200) * 100).toFixed(0)}%
-          </p>
-          <span className="text-[10px] text-slate-400">{currentQty} of 1,200 units committed</span>
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+          <span className="text-[10px] font-semibold text-slate-500 uppercase">Inventory at Risk</span>
+          <p className="text-base font-extrabold text-amber-600 mt-0.5">1,200 Units</p>
+          <span className="text-[10px] text-slate-400">High Stock Pressure</span>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+          <span className="text-[10px] font-semibold text-slate-500 uppercase">Average Discount</span>
+          <p className="text-base font-extrabold text-slate-900 mt-0.5">4.2%</p>
+          <span className="text-[10px] text-slate-400">Volume Concession</span>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs">
+          <span className="text-[10px] font-semibold text-slate-500 uppercase">Win Rate</span>
+          <p className="text-base font-extrabold text-emerald-600 mt-0.5">84.2%</p>
+          <span className="text-[10px] text-slate-400">High Conversion</span>
         </div>
       </div>
 
-      {/* Main Command Center Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* LEFT COLUMN: DEMAND INBOX & CONCESSION MATRIX (7 Cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          
-          {/* Demand Inbox */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Live Demand Inbox & RFQs</h3>
-                <p className="text-xs text-slate-500">Active agent-to-agent procurement requests</p>
-              </div>
-              <span className="text-xs font-semibold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md border border-blue-200">
-                1 Active RFQ
-              </span>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-[10px] font-mono text-slate-400">REQ-2026-8841</span>
-                  <h4 className="text-xs font-bold text-slate-900">SKF 6205-2RS1 Deep Groove Ball Bearing</h4>
-                  <p className="text-xs text-slate-600 mt-0.5">Quantity: {currentQty} units | Delivery: 5 days</p>
-                </div>
-                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  MARGIN FEASIBLE
-                </span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-[11px] bg-white p-2.5 rounded-lg border border-slate-200">
-                <div>
-                  <span className="text-slate-400">Buyer Target:</span>
-                  <p className="font-semibold text-slate-800">₹{(state.buyerPolicy.targetTotalBudget || 360000).toLocaleString()}</p>
-                </div>
-                <div>
-                  <span className="text-slate-400">Offered Unit Price:</span>
-                  <p className="font-semibold text-slate-800">₹{unitPrice}</p>
-                </div>
-                <div>
-                  <span className="text-slate-400">Payment Terms:</span>
-                  <p className="font-semibold text-slate-800">{currentDeal.paymentTerms}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Give/Get Concession Matrix */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Give/Get Concession Trade-Off Engine</h3>
-                <p className="text-xs text-slate-500">Deterministic value exchange visualizer</p>
-              </div>
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                +₹25,000 Net Seller Surplus
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              {/* WHAT SELLER GIVES */}
-              <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-4 space-y-2">
-                <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">What Seller Gives</span>
-                <ul className="text-xs space-y-1.5 text-amber-950 font-medium">
-                  <li className="flex items-center justify-between">
-                    <span>• Unit Price Discount:</span>
-                    <span className="font-bold">-₹124.55/unit</span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span>• Expedited Dispatch:</span>
-                    <span className="font-bold">4 days (-1 day)</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* WHAT SELLER GETS */}
-              <div className="bg-emerald-50/60 border border-emerald-200 rounded-xl p-4 space-y-2">
-                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">What Seller Gets</span>
-                <ul className="text-xs space-y-1.5 text-emerald-950 font-medium">
-                  <li className="flex items-center justify-between">
-                    <span>• Order Volume Concession:</span>
-                    <span className="font-bold">+50 units</span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span>• Immediate Cashflow:</span>
-                    <span className="font-bold">Upfront Payment</span>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-          </div>
-
+      {/* 3. ACTIVE NEGOTIATIONS SECTION */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+        <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+          <h3 className="text-sm font-bold text-slate-900">ACTIVE NEGOTIATIONS</h3>
+          <span className="text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded">
+            Live RFQ Stream
+          </span>
         </div>
 
-        {/* RIGHT COLUMN: MARGIN VS DISCOUNT GRAPH (5 Cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="space-y-3">
+          {activeNegotiations.map((item, idx) => (
+            <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-200 pb-2">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500">BUYER: {item.buyer}</span>
+                  <h4 className="text-xs font-bold text-slate-900">{item.product}</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold text-slate-700 bg-white border border-slate-200 px-2 py-0.5 rounded">
+                    {item.stage}
+                  </span>
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
+                    Margin: {formatPercent(item.margin)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-700">
+                <div><span>Qty:</span> <strong className="text-slate-900">{formatNumber(item.qty)} units</strong></div>
+                <div><span>Current Offer:</span> <strong className="text-slate-900">{formatMoney(item.offer)}</strong></div>
+                <div><span>Unit Price:</span> <strong className="text-slate-900">{formatMoney(item.unitPrice, true)}</strong></div>
+                <div><span>SLA:</span> <strong className="text-slate-900">{item.delivery}</strong></div>
+              </div>
+
+              <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg text-emerald-900 font-medium">
+                <span className="font-bold text-[10px] uppercase text-emerald-800">RECOMMENDED ACTION:</span>
+                <p className="mt-0.5">{item.recommendation}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 4. SELLER GRAPHS */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+        <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">MERCHANT COMMERCIAL ANALYTICS</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <MarginDiscountChart />
-
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Automated Margin Guardrails</h4>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <span className="text-slate-600 font-medium">Hard Minimum Floor Margin:</span>
-                <span className="font-bold text-red-600">10.0% (₹516/unit)</span>
-              </div>
-              <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <span className="text-slate-600 font-medium">Target Profit Margin:</span>
-                <span className="font-bold text-emerald-600">22.0% (₹577/unit)</span>
-              </div>
-              <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <span className="text-slate-600 font-medium">Current Deal Margin:</span>
-                <span className="font-bold text-blue-600">{marginPct}%</span>
-              </div>
-            </div>
-          </div>
+          <InventoryPressureChart />
+          <DemandCapacityChart />
+          <RevenueContributionChart />
         </div>
+      </div>
 
+      {/* 5. MERCHANT INSIGHTS */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+        <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">MERCHANT INSIGHTS</h3>
+        <div className="space-y-2 text-xs">
+          {merchantInsights.map((insight, idx) => (
+            <div key={idx} className="bg-slate-50 border border-slate-200 p-3 rounded-lg text-slate-800 flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span>{insight}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
     </div>

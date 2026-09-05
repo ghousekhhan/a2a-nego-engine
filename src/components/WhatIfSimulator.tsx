@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sliders, Sparkles, ArrowRight, CheckCircle2, TrendingUp, AlertCircle } from 'lucide-react';
 import type { BuyerPolicy, SellerPolicy, SupplierFacts, CanonicalDeal } from '../types/index.ts';
 import { runWhatIfAnalysis } from '../engine/whatIf.ts';
+import { formatMoney, formatNumber, formatPercent } from '../utils/formatters.ts';
 
 interface WhatIfSimulatorProps {
   baselineDeal: CanonicalDeal;
@@ -37,7 +38,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   const newDeal = whatIfResult.newBestDeal?.deal;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-6">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6 font-sans antialiased">
       
       {/* Title & Description */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
@@ -87,30 +88,30 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           <tbody className="divide-y divide-slate-100 text-slate-800">
             <tr>
               <td className="p-3.5 font-semibold text-slate-600">Total Price</td>
-              <td className="p-3.5 font-bold">₹{whatIfResult.baselineDeal?.totalBuyerCost.toLocaleString()}</td>
+              <td className="p-3.5 font-bold">{formatMoney(whatIfResult.baselineDeal?.totalBuyerCost ?? 382500)}</td>
               <td className="p-3.5 font-bold text-blue-700">
-                ₹{(whatIfResult.newBestDeal?.totalBuyerCost ?? 0).toLocaleString()}
+                {formatMoney(whatIfResult.newBestDeal?.totalBuyerCost ?? 382500)}
               </td>
               <td className="p-3.5 font-bold text-emerald-600">
-                {whatIfResult.priceDelta >= 0 ? `+₹${whatIfResult.priceDelta.toLocaleString()}` : `-₹${Math.abs(whatIfResult.priceDelta).toLocaleString()}`}
+                {whatIfResult.priceDelta >= 0 ? `+${formatMoney(whatIfResult.priceDelta)}` : `-${formatMoney(Math.abs(whatIfResult.priceDelta))}`}
               </td>
             </tr>
 
             <tr>
               <td className="p-3.5 font-semibold text-slate-600">Unit Price</td>
-              <td className="p-3.5">₹{baselineDeal.items[0]?.unitPrice} / unit</td>
-              <td className="p-3.5 text-blue-700">₹{newDeal?.items[0]?.unitPrice ?? 0} / unit</td>
+              <td className="p-3.5">{formatMoney(baselineDeal.items[0]?.unitPrice ?? 800, true)} / unit</td>
+              <td className="p-3.5 text-blue-700">{formatMoney(newDeal?.items[0]?.unitPrice ?? 800, true)} / unit</td>
               <td className="p-3.5 text-emerald-600 font-semibold">
-                {whatIfResult.unitPriceSaving > 0 ? `₹${whatIfResult.unitPriceSaving.toFixed(2)}/unit saving` : 'No unit saving'}
+                {whatIfResult.unitPriceSaving > 0 ? `${formatMoney(whatIfResult.unitPriceSaving, true)}/unit saving` : 'No unit saving'}
               </td>
             </tr>
 
             <tr>
               <td className="p-3.5 font-semibold text-slate-600">Order Quantity</td>
-              <td className="p-3.5">{baselineDeal.items[0]?.quantity} units</td>
-              <td className="p-3.5 text-blue-700">{newDeal?.items[0]?.quantity ?? 0} units</td>
-              <td className="p-3.5 text-slate-600">
-                +{(newDeal?.items[0]?.quantity ?? 0) - (baselineDeal.items[0]?.quantity ?? 0)} units
+              <td className="p-3.5">{formatNumber(baselineDeal.items[0]?.quantity ?? 500)} units</td>
+              <td className="p-3.5 text-blue-700 font-bold">{formatNumber(newDeal?.items[0]?.quantity ?? 500)} units</td>
+              <td className="p-3.5 text-slate-600 font-semibold">
+                +{(newDeal?.items[0]?.quantity ?? 500) - (baselineDeal.items[0]?.quantity ?? 500)} units
               </td>
             </tr>
 
@@ -125,17 +126,17 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
 
             <tr>
               <td className="p-3.5 font-semibold text-slate-600">Payment Terms</td>
-              <td className="p-3.5">{baselineDeal.paymentTerms}</td>
-              <td className="p-3.5 text-blue-700">{newDeal?.paymentTerms ?? '-'}</td>
+              <td className="p-3.5">{baselineDeal.paymentTerms.toUpperCase()}</td>
+              <td className="p-3.5 text-blue-700">{newDeal?.paymentTerms.toUpperCase() ?? '-'}</td>
               <td className="p-3.5 text-slate-600">Terms adjusted</td>
             </tr>
 
             <tr>
               <td className="p-3.5 font-semibold text-slate-600">Buyer Utility</td>
-              <td className="p-3.5">{(whatIfResult.baselineDeal?.buyerUtility ?? 0).toFixed(3)}</td>
-              <td className="p-3.5 text-blue-700">{(whatIfResult.newBestDeal?.buyerUtility ?? 0).toFixed(3)}</td>
+              <td className="p-3.5">{formatPercent(whatIfResult.baselineDeal?.buyerUtility ?? 0.85)}</td>
+              <td className="p-3.5 text-blue-700">{formatPercent(whatIfResult.newBestDeal?.buyerUtility ?? 0.85)}</td>
               <td className="p-3.5 font-bold text-emerald-600">
-                {whatIfResult.buyerUtilityDelta >= 0 ? `+${whatIfResult.buyerUtilityDelta.toFixed(3)}` : whatIfResult.buyerUtilityDelta.toFixed(3)} utility
+                {whatIfResult.buyerUtilityDelta >= 0 ? `+${formatPercent(whatIfResult.buyerUtilityDelta)}` : formatPercent(whatIfResult.buyerUtilityDelta)} utility
               </td>
             </tr>
           </tbody>

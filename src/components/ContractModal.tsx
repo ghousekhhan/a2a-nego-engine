@@ -2,6 +2,7 @@ import React from 'react';
 import { FileText, ShieldCheck, CheckCircle2, ArrowRight, Building2, Calendar, CreditCard, Lock } from 'lucide-react';
 import type { CanonicalDeal, ScoredDeal } from '../types/index.ts';
 import { SEEDED_PRODUCT } from '../demoData.ts';
+import { formatMoney, formatNumber } from '../utils/formatters.ts';
 
 interface ContractModalProps {
   scoredDeal: ScoredDeal;
@@ -24,7 +25,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const lineTotal = Math.round(qty * unitPrice);
 
   return (
-    <div className="max-w-[1000px] mx-auto p-4 space-y-6">
+    <div className="max-w-[1000px] mx-auto p-4 space-y-6 font-sans antialiased">
       
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -45,7 +46,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       </div>
 
       {/* Contract Document Card */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 font-sans">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
         
         {/* Document Header */}
         <div className="flex justify-between items-start border-b border-slate-200 pb-4">
@@ -97,10 +98,10 @@ export const ContractModal: React.FC<ContractModalProps> = ({
               <tbody className="divide-y divide-slate-100 text-slate-800">
                 <tr>
                   <td className="p-3 font-semibold">{SEEDED_PRODUCT.name}</td>
-                  <td className="p-3">{qty} units</td>
-                  <td className="p-3">₹{unitPrice.toFixed(2)}/unit</td>
+                  <td className="p-3">{formatNumber(qty)} units</td>
+                  <td className="p-3">{formatMoney(unitPrice, true)}/unit</td>
                   <td className="p-3 text-right font-bold text-emerald-700">
-                    ₹{lineTotal.toLocaleString()}
+                    {formatMoney(lineTotal)}
                   </td>
                 </tr>
               </tbody>
@@ -116,7 +117,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           </div>
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div className="text-[10px] text-slate-500 uppercase font-semibold">Payment Terms</div>
-            <div className="font-bold text-blue-700 mt-1">{deal.paymentTerms}</div>
+            <div className="font-bold text-blue-700 mt-1">{deal.paymentTerms.toUpperCase()}</div>
           </div>
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div className="text-[10px] text-slate-500 uppercase font-semibold">Warranty</div>
@@ -140,13 +141,13 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           onClick={onBack}
           className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-300 transition-all"
         >
-          Back to Control Room
+          Back to Deal Room
         </button>
         <button
           onClick={onProceedToPayment}
           className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs flex items-center gap-2 transition-all"
         >
-          <CreditCard className="w-4 h-4" /> Proceed to Razorpay Checkout <ArrowRight className="w-4 h-4" />
+          <CreditCard className="w-4 h-4" /> Proceed to Razorpay Payment <ArrowRight className="w-4 h-4" />
         </button>
       </div>
 

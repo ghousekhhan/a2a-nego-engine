@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCard, CheckCircle2, ShieldCheck, ArrowRight, Lock, RefreshCw } from 'lucide-react';
 import type { ScoredDeal } from '../types/index.ts';
+import { formatMoney, formatNumber } from '../utils/formatters.ts';
 
 interface RazorpayModalProps {
   scoredDeal: ScoredDeal;
@@ -26,6 +27,8 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
 
   const amountRupees = scoredDeal.totalBuyerCost;
   const amountPaise = amountRupees * 100;
+  const qty = scoredDeal.deal.items[0]?.quantity ?? 500;
+  const unitPrice = scoredDeal.deal.items[0]?.unitPrice ?? 695.45;
 
   const handleRazorpayCheckout = () => {
     setIsProcessing(true);
@@ -39,7 +42,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
         amount: amountPaise,
         currency: 'INR',
         name: 'A2A Deal Engine Settlement',
-        description: `Payment for Approved Contract (${scoredDeal.deal.items[0]?.quantity} units @ ₹${scoredDeal.deal.items[0]?.unitPrice})`,
+        description: `Payment for Approved Contract (${qty} units @ ${formatMoney(unitPrice, true)})`,
         order_id: generatedOrderId,
         handler: function (response: any) {
           setIsProcessing(false);
@@ -78,7 +81,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
   };
 
   return (
-    <div className="max-w-[800px] mx-auto p-4 space-y-6">
+    <div className="max-w-[800px] mx-auto p-4 space-y-6 font-sans antialiased">
       
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-4">
@@ -86,36 +89,36 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
           <CreditCard className="w-5 h-5 text-blue-600" />
           <div>
             <h2 className="font-bold text-lg text-slate-900">
-              Razorpay Settlement Layer
+              Razorpay Settlement Execution Layer
             </h2>
             <p className="text-xs text-slate-500">
-              Execute transaction only after human contract approval.
+              Execute commercial payment only after explicit human authorization.
             </p>
           </div>
         </div>
         <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-          Razorpay Standard Checkout SDK
+          Razorpay Sandbox / Demo Payment
         </span>
       </div>
 
       {!paymentComplete ? (
         /* Razorpay Checkout Trigger Card */
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 font-sans">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
           
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-            <div className="text-[10px] text-slate-500 uppercase font-semibold">Approved Transaction Total</div>
-            <div className="text-3xl font-bold text-emerald-700">
-              ₹{amountRupees.toLocaleString()}
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+            <div className="text-[10px] text-slate-500 uppercase font-semibold">Approved Contract Total</div>
+            <div className="text-3xl font-black text-emerald-700">
+              {formatMoney(amountRupees)}
             </div>
-            <div className="text-xs text-slate-600">
-              {scoredDeal.deal.items[0]?.quantity} units of 6205 Industrial Bearing
+            <div className="text-xs text-slate-600 font-medium">
+              {formatNumber(qty)} units of Industrial Bearing ({formatMoney(unitPrice, true)}/unit)
             </div>
           </div>
 
           <div className="space-y-2 text-xs">
             <div className="flex justify-between text-slate-700">
               <span className="text-slate-500">Payment Terms:</span>
-              <span className="font-bold text-blue-700">{scoredDeal.deal.paymentTerms}</span>
+              <span className="font-bold text-blue-700">{scoredDeal.deal.paymentTerms.toUpperCase()}</span>
             </div>
             <div className="flex justify-between text-slate-700">
               <span className="text-slate-500">Merchant Account:</span>
@@ -129,10 +132,10 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
             </div>
           </div>
 
-          <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200 text-xs text-blue-900 flex items-start gap-2">
+          <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200 text-xs text-blue-900 flex items-start gap-2">
             <Lock className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-            <p>
-              Razorpay sandbox test mode configured. Clicking below initializes standard Razorpay checkout flow.
+            <p className="leading-relaxed font-medium">
+              <strong>Razorpay Sandbox / Demo Payment:</strong> Initializing standard Razorpay Checkout SDK boundary to execute finalized contract terms.
             </p>
           </div>
 
@@ -151,11 +154,11 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
             >
               {isProcessing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Processing Razorpay Gateway...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Initializing Razorpay Gateway...
                 </>
               ) : (
                 <>
-                  <CreditCard className="w-4 h-4" /> Pay ₹{amountRupees.toLocaleString()} via Razorpay
+                  <CreditCard className="w-4 h-4" /> Pay {formatMoney(amountRupees)} via Razorpay Sandbox
                 </>
               )}
             </button>
@@ -187,7 +190,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Amount Paid:</span>
-              <span className="font-bold text-slate-900">₹{amountRupees.toLocaleString()}</span>
+              <span className="font-bold text-slate-900">{formatMoney(amountRupees)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Timestamp:</span>
@@ -197,7 +200,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
 
           <div className="pt-2">
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" /> DEAL COMPLETED & EXECUTION LOCKED
+              <ShieldCheck className="w-4 h-4 text-emerald-600" /> COMMERCIAL CONTRACT EXECUTED & LOCKED
             </span>
           </div>
         </div>
